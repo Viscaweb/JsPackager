@@ -1,0 +1,44 @@
+'use strict';
+var webpack = require('webpack');
+module.exports = {
+
+    // Entry points for the application
+    entry : {
+        {% for entryPoint in entryPoints %}
+        "{{ entryPoint.name }}": "{{ entryPoint.path|raw }}"
+{% if loop.last == false %}
+,
+{% endif %}
+        {% endfor %}
+    },
+
+    output: {
+        filename: "[name].dist.js",
+        chunkFilename: "[id].dist.js",
+
+        // The base directory (absolute path) for resolving
+        // the entry option.
+        path: '{{ outputPath|raw }}'
+    },
+
+    resolve: {
+        alias: {{ alias|json_encode(constant('JSON_PRETTY_PRINT')+constant('JSON_UNESCAPED_SLASHES'))|raw }}
+    },
+
+    module :{
+        loaders: [
+            // Disable AMD @todo To check.
+            { test: /\.js/, loader: 'imports?define=>false'},
+            {
+                test: /bootstrap/,
+                loader: "imports?$=jquery"
+            },
+        ]
+    },
+
+    plugins : [
+        new webpack.optimize.DedupePlugin(),
+        new webpack.optimize.CommonsChunkPlugin("commons.js", ['jquery']),
+        //	new webpack.optimize.UglifyJsPlugin()
+    ]
+};

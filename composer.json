@@ -1,0 +1,23 @@
+{
+  "name": "viscaweb/jspackager",
+  "description": "JavaScript Packager",
+  "type": "library",
+  "license": "proprietary",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Visca\\JsPackager\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\Functional\\": "Tests/Functional"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.*"
+  }
+}
