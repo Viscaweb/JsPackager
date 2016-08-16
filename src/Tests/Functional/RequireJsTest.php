@@ -49,14 +49,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
         $pageName = 'xxx';
         $output = $this->compiler->compile($pageName, $config);
 
-        $expected = sprintf(
-            '<!-- JS for xxx -->'."\n".
-            '<script src="http://life.dev:8080/bundles/app/js/common/requirejs.js"></script>'."\n".
-            '<script>requirejs.config({'."\n".
-            '    "baseUrl": "/web/"'."\n".
-            '});</script><!-- END of JS -->',
-            $pageName
-        );
+        $expected = file_get_contents(__DIR__.'/requireJsExpected/baseUrl.js');
 
         $this->assertEquals($expected, $output);
     }
@@ -77,16 +70,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
         $pageName = 'xxx';
         $output = $this->compiler->compile($pageName, $config);
 
-        $expected = sprintf(
-            '<!-- JS for %s -->'."\n".
-            '<script src="http://life.dev:8080/bundles/app/js/common/requirejs.js"></script>'."\n".
-            "<script>requirejs.config({\n".
-            str_repeat(' ', 4)."\"paths\": {\n".
-            str_repeat(' ', 8)."\"jquery\": \"js/jquery.min.js\"\n".
-            str_repeat(' ', 4)."}\n".
-            "});</script><!-- END of JS -->",
-            $pageName
-        );
+        $expected = file_get_contents(__DIR__.'/requireJsExpected/alias.js');
 
         $this->assertEquals($expected, $output);
     }
@@ -109,23 +93,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
         $pageName = 'xxx';
         $output = $this->compiler->compile($pageName, $config);
 
-        $expected = sprintf(
-            '<!-- JS for xxx -->'."\n".
-            '<script src="http://life.dev:8080/bundles/app/js/common/requirejs.js"></script>'."\n".
-            '<script>requirejs.config({'."\n".
-            '    "paths": {'."\n".
-            '        "bootstrap": "js/bootstrap.min.js"'."\n".
-            '    },'."\n".
-            '    "shim": {'."\n".
-            '        "bootstrap": {'."\n".
-            '            "deps": ['."\n".
-            '                "jquery"'."\n".
-            '            ]'."\n".
-            '        }'."\n".
-            '    }'."\n".
-            '});</script><!-- END of JS -->',
-            $pageName
-        );
+        $expected = file_get_contents(__DIR__.'/requireJsExpected/shim.js');
 
         $this->assertEquals($expected, $output);
     }
@@ -147,14 +115,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
 
         $output = $this->compiler->compile($pageName, $config);
 
-        $expected = sprintf(
-            '<!-- JS for xxx -->'."\n".
-            '<script src="http://life.dev:8080/bundles/app/js/common/requirejs.js"></script>'."\n".
-            '<script>requirejs.config([]);'.
-            'console.log(\'hello\');</script>'.
-            '<!-- END of JS -->',
-            $pageName
-        );
+        $expected = file_get_contents(__DIR__.'/requireJsExpected/entryPoints.js');
 
         $this->assertEquals($expected, $output);
     }
