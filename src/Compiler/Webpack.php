@@ -22,14 +22,13 @@ class Webpack extends AbstractCompiler
      *
      * @param WebpackConfig $webpackConfig
      * @param string        $temporalPath
-     * @param UrlResolver   $urlResolver
      * @param bool          $debug
      */
-    public function __construct(WebpackConfig $webpackConfig, $temporalPath, UrlResolver $urlResolver, $debug = false)
+    public function __construct(WebpackConfig $webpackConfig, $temporalPath, $debug = false)
     {
         $this->webpackConfig = $webpackConfig;
         $this->temporalPath = rtrim($temporalPath, '/').'/';
-        parent::__construct($urlResolver, $debug);
+        $this->setDebug($debug);
     }
 
     /**

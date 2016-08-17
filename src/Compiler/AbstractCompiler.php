@@ -8,17 +8,28 @@ namespace Visca\JsPackager\Compiler;
 abstract class AbstractCompiler implements CompilerInterface
 {
     /** @var boolean */
-    protected $debug;
+    protected $debug = false;
 
     /**
-     * AbstractCompiler constructor.
-     *
-     * @param bool $debug
+     * @return boolean
      */
-    public function __construct($debug = false)
+    public function isDebug()
+    {
+        return $this->debug;
+    }
+
+    /**
+     * @param boolean $debug
+     *
+     * @return AbstractCompiler
+     */
+    public function setDebug($debug)
     {
         $this->debug = $debug;
+
+        return $this;
     }
+
 
     /**
      * @param string $url
