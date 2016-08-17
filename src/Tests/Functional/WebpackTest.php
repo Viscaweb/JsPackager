@@ -32,7 +32,7 @@ class WebpackTest extends WebTestCase
 
         $this->temporalPath = __DIR__.'/../../Resources/temp';
         $template = realpath(__DIR__.'/../../Resources/webpack.config.yml.dist');
-        /** @var \Twig_Environment $twig */
+        /** @var Twig_Environment $twig */
         $twig = $this->getContainer()->get('twig');
         $this->urlResolver = new UrlResolver($twig);
 
@@ -57,6 +57,9 @@ class WebpackTest extends WebTestCase
         $this->assertEquals('<script src="/commons.js"></script>', $output);
     }
 
+    /**
+     *
+     */
     public function testContentEntryPoint()
     {
         $entryPoint = new EntryPoint();
