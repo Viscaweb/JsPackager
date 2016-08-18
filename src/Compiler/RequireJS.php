@@ -42,7 +42,11 @@ class RequireJS extends AbstractCompiler
         $script .= $this->compileRequireJsConfig($config)."\n";
 
         // Include inline Javascript page entry point
-        $script .= implode("\n", $config->getEntryPointsGlobalInclude());
+        foreach ($config->getEntryPointsGlobalInline() as $ep) {
+            $script .= $ep->getContent()."\n";
+        }
+
+
         foreach ($config->getEntryPoints() as $entryPoint) {
             if ($entryPoint->getName() == $pageName) {
                 $script .= $entryPoint->getContent();
