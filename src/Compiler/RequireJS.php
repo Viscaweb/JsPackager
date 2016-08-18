@@ -24,6 +24,7 @@ class RequireJS extends AbstractCompiler
             $pageName
         );
         $script .= $this->addScriptTag('bundles/app/js/common/requirejs.js');
+        $script .= "\n";
 
         // Entry point configuration
         // Do we need to add more external script tags?
@@ -31,19 +32,21 @@ class RequireJS extends AbstractCompiler
         if (is_array($externals)) {
             foreach ($externals as $url) {
                 $script .= $this->addScriptTag($url->getPath());
+                $script .= "\n";
             }
         }
 
         $script .= '<script>';
 
         // Include RequireJS inline configuration
-        $script .= $this->compileRequireJsConfig($config);
+        $script .= $this->compileRequireJsConfig($config)."\n";
 
         // Include inline Javascript page entry point
         $script .= implode("\n", $config->getEntryPointsGlobalInclude());
         foreach ($config->getEntryPoints() as $entryPoint) {
             if ($entryPoint->getName() == $pageName) {
                 $script .= $entryPoint->getContent();
+                $script .= "\n";
             }
         }
         $script .= '</script>';
