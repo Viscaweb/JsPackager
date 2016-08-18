@@ -119,13 +119,37 @@ class ConfigurationDefinition
     }
 
     /**
+     * @param array $globalIncludes
+     *
+     * @return $this
+     */
+    public function setEntryPointsGlobalIncludes($globalIncludes)
+    {
+        $this->globalInclude = $globalIncludes;
+
+        return $this;
+    }
+
+    /**
      * Returns a list of Javascript paths that is intended to be appended
      * inline into the designed entry point.
      *
      * @return array
      */
-    public function getEntryPointsGlobalInclude()
+    public function getEntryPointsGlobalInline()
     {
         return $this->globalInline;
+    }
+
+    /**
+     * @param array $globalInline
+     *
+     * @return $this
+     */
+    public function setEntryPointsGlobalInline($globalInline)
+    {
+        $this->globalInline = $globalInline;
+
+        return $this;
     }
 }

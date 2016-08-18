@@ -2,6 +2,8 @@
 
 namespace Visca\JsPackager\Compiler;
 
+use Visca\JsPackager\Configuration\ResourceJs;
+use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
 
 /**
@@ -76,6 +78,7 @@ class RequireJS extends AbstractCompiler
 
         $aliases = $config->getAlias();
         if (is_array($aliases)) {
+            /** @var ResourceJs $alias */
             foreach ($aliases as $alias) {
                 //$aliasInfo = $this->getResolveAliasInfo($value);
 
@@ -86,7 +89,13 @@ class RequireJS extends AbstractCompiler
 
                 $shims = $alias->getShims();
                 if ($shims !== null && is_array($shims)) {
-                    $data['shim'][$alias->getAlias()] = ['deps' => $shims];
+                    $modules = [];
+                    /** @var Shim $shim */
+                    foreach ($shims as $shim) {
+                        $modules[] = $shim->getModuleName();
+                    }
+
+                    $data['shim'][$alias->getAlias()] = ['deps' => $modules];
                 }
             }
         }
