@@ -27,7 +27,7 @@ class ResourceJs
      */
     public function getPath()
     {
-        return $this->path;
+        return '/'.ltrim($this->path, '/');
     }
 
     /**
