@@ -25,7 +25,7 @@ class RequireJS extends AbstractCompiler
             "<!-- JS for %s -->\n",
             $pageName
         );
-        $script .= $this->addScriptTag('bundles/app/js/common/requirejs.js');
+        $script .= $this->addScriptTag('/bundles/app/js/common/requirejs.js');
         $script .= "\n";
 
         // Entry point configuration
@@ -80,8 +80,6 @@ class RequireJS extends AbstractCompiler
         if (is_array($aliases)) {
             /** @var ResourceJs $alias */
             foreach ($aliases as $alias) {
-                //$aliasInfo = $this->getResolveAliasInfo($value);
-
                 $path = $alias->getPath();
                 if ($path !== null) {
                     $data['paths'][$alias->getAlias()] = $path;
