@@ -67,7 +67,7 @@ class EntryPoint
      */
     public function getPath()
     {
-        return $this->path;
+        return empty($this->path) ? null : '/'.rtrim($this->path, '/');
     }
 
     /**
