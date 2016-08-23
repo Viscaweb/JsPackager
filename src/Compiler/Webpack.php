@@ -14,9 +14,6 @@ class Webpack extends AbstractCompiler
     /** @var WebpackConfig */
     protected $webpackConfig;
 
-    /** @var string */
-    protected $temporalPath;
-
     /**
      * Webpack constructor.
      *
@@ -24,10 +21,9 @@ class Webpack extends AbstractCompiler
      * @param string        $temporalPath
      * @param bool          $debug
      */
-    public function __construct(WebpackConfig $webpackConfig, $temporalPath, $debug = false)
+    public function __construct(WebpackConfig $webpackConfig, $debug = false)
     {
         $this->webpackConfig = $webpackConfig;
-        $this->temporalPath = rtrim($temporalPath, '/').'/';
         $this->setDebug($debug);
     }
 
@@ -53,7 +49,9 @@ class Webpack extends AbstractCompiler
     {
         $webpackConfig = $this->webpackConfig->compile($config);
 
-        file_put_contents($this->temporalPath.'webpack.config.js', $webpackConfig);
+        $path = $this->getTemporalPath();
+
+        file_put_contents($path.'/webpack.config.js', $webpackConfig);
     }
 
     /**
@@ -61,8 +59,14 @@ class Webpack extends AbstractCompiler
      */
     protected function compileJs($pageName)
     {
-        $path = realpath($this->temporalPath);
-        $output = shell_exec('cd '.$path.' && webpack --json');
+        $path = $this->getTemporalPath();
+        $cmd =
+            '/Volumes/Develop/GitRepos/viscaweb/life/'.
+            'node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
+//        $output = shell_exec('webpack --json --config '.$path.'/webpack.config.js');
+        $output = [];
+        $return_var = [];
+        $dd = exec($cmd, $output, $return_var);
 
         // Analyze output
         $jsonOutput = json_decode($output, true);
@@ -92,5 +96,12 @@ class Webpack extends AbstractCompiler
         }
 
         return $assets;
+    }
+
+    private function getTemporalPath()
+    {
+//        return sys_get_temp_dir();
+
+        return '/Volumes/Develop/GitRepos/viscaweb/life/tmp';
     }
 }

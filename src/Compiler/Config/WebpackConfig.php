@@ -2,6 +2,7 @@
 
 namespace Visca\JsPackager\Compiler\Config;
 
+use Symfony\Component\HttpKernel\Config\FileLocator;
 use Twig_Environment;
 use Visca\JsPackager\Configuration\EntryPoint;
 use Visca\JsPackager\Configuration\Shim;
@@ -16,24 +17,24 @@ class WebpackConfig
     protected $twig;
 
     /** @var string */
-    protected $template;
+    protected $templatePath;
 
-    /** @var string */
-    protected $temporalPath;
+    /** @var FileLocator */
+    protected $fileLocator;
 
     /**
      * WebpackConfig constructor.
      *
      * @param Twig_Environment $twig
-     * @param string           $template      Path to config.js template
-     * @param string           $temporalPath  Path to where object will store temporal
-     *                                        content.
+     * @param string           $templatePath  Path to config.js template
      */
-    public function __construct(Twig_Environment $twig, $template, $temporalPath = './')
+    public function __construct(Twig_Environment $twig, $templatePath/*, FileLocator $fileLocator*/)
     {
         $this->twig = $twig;
-        $this->template = $template;
-        $this->temporalPath = rtrim($temporalPath, '/').'/';
+        // pfff, i don't like this, but i can't find any other
+        // way to pass '@' from yml
+        $this->templatePath = '@'.$templatePath;
+//        $this->fileLocator = $fileLocator;
     }
 
     /**
@@ -89,7 +90,7 @@ class WebpackConfig
 
 
         $output = $this->twig->render(
-            $this->template,
+            $this->templatePath,
 //            'ViscaJsEntryPointBundle::webpack.config.sample.js.twig',
             [
                 'entryPoints' => $entryPoints,
@@ -110,10 +111,16 @@ class WebpackConfig
     {
         $filename = $entryPoint->getName().'.entry_point.js';
 
-        $path = $this->temporalPath.$filename;
+        $path = $this->getTemporalPath().'/'.$filename;
 
         file_put_contents($path, $entryPoint->getContent());
 
         return $path;
+    }
+
+    private function getTemporalPath()
+    {
+        return '/Volumes/Develop/GitRepos/viscaweb/life/tmp';
+        return sys_get_temp_dir();
     }
 }
