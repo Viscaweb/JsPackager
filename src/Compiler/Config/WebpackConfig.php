@@ -5,6 +5,7 @@ namespace Visca\JsPackager\Compiler\Config;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Twig_Environment;
 use Visca\JsPackager\Configuration\EntryPoint;
+use Visca\JsPackager\Configuration\EntryPointContent;
 use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
 
@@ -74,16 +75,16 @@ class WebpackConfig
         $entryPoints = [];
 
         /** @var EntryPoint $entryPoint */
-        foreach ($config->getEntryPoints() as $entryPoint) {
+        foreach ($config->getEntryPoints() as $ep) {
 
-            if (empty($entryPoint->getPath()) === false) {
-                $path = $entryPoint->getPath();
-            } else {
-                $path = $this->saveTemporalEntryPoint($entryPoint);
+            if ($ep instanceof EntryPointFile) {
+                $path = $ep->getPath();
+            } elseif ($ep instanceof EntryPointContent) {
+                $path = $this->saveTemporalEntryPoint($ep);
             }
 
             $entryPoints[] = [
-                'name' => $entryPoint->getName(),
+                'name' => $ep->getName(),
                 'path' => $path
             ];
         }
@@ -103,11 +104,11 @@ class WebpackConfig
     }
 
     /**
-     * @param EntryPoint $entryPoint
+     * @param EntryPointContent $entryPoint
      *
      * @return string
      */
-    private function saveTemporalEntryPoint(EntryPoint $entryPoint)
+    private function saveTemporalEntryPoint(EntryPointContent $entryPoint)
     {
         $filename = $entryPoint->getName().'.entry_point.js';
 

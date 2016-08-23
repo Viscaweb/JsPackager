@@ -69,13 +69,13 @@ class Webpack extends AbstractCompiler
         $dd = exec($cmd, $output, $return_var);
 
         // Analyze output
-        $jsonOutput = json_decode($output, true);
-        $assets = $this->getAssets($jsonOutput);
+//        $jsonOutput = json_decode($output, true);
+//        $assets = $this->getAssets($jsonOutput);
 
         $output = '';
-        foreach ($assets as $url) {
-            $output.= $this->addScriptTag($jsonOutput['publicPath'].'/'.$url);
-        }
+//        foreach ($assets as $url) {
+//            $output.= $this->addScriptTag($jsonOutput['publicPath'].'/'.$url);
+//        }
 
         return $output;
     }

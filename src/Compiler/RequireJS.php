@@ -2,6 +2,8 @@
 
 namespace Visca\JsPackager\Compiler;
 
+use Visca\JsPackager\Configuration\EntryPointContent;
+use Visca\JsPackager\Configuration\EntryPointFile;
 use Visca\JsPackager\Configuration\ResourceJs;
 use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
@@ -32,9 +34,11 @@ class RequireJS extends AbstractCompiler
         // Do we need to add more external script tags?
         $externals = $config->getEntryPointsGlobalIncludes();
         if (is_array($externals)) {
-            foreach ($externals as $url) {
-                $script .= $this->addScriptTag($url->getPath());
-                $script .= "\n";
+            foreach ($externals as $ep) {
+                if ($ep instanceof EntryPointFile) {
+                    $script .= $this->addScriptTag($ep->getPath());
+                    $script .= "\n";
+                }
             }
         }
 
@@ -45,14 +49,19 @@ class RequireJS extends AbstractCompiler
 
         // Include inline Javascript page entry point
         foreach ($config->getEntryPointsGlobalInline() as $ep) {
-            $script .= $ep->getContent()."\n";
+            if ($ep instanceof EntryPointContent) {
+                $script .= $ep->getContent()."\n";
+            }
         }
 
 
-        foreach ($config->getEntryPoints() as $entryPoint) {
-            if ($entryPoint->getName() == $pageName) {
-                $script .= $entryPoint->getContent();
-                $script .= "\n";
+        foreach ($config->getEntryPoints() as $ep) {
+            if ($ep->getName() == $pageName) {
+
+                if ($ep instanceof EntryPointContent) {
+                    $script .= $ep->getContent();
+                    $script .= "\n";
+                }
             }
         }
         $script .= '</script>';

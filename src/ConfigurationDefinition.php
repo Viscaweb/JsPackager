@@ -3,6 +3,7 @@
 namespace Visca\JsPackager;
 
 use Visca\JsPackager\Configuration\EntryPoint;
+use Visca\JsPackager\Configuration\EntryPointInterface;
 use Visca\JsPackager\Configuration\ResourceJs as ResourceAlias;
 
 /**
@@ -74,9 +75,9 @@ class ConfigurationDefinition
     /**
      * Adds a new entry point to be processed.
      *
-     * @param EntryPoint $entryPoint
+     * @param EntryPointInterface $entryPoint
      */
-    public function addEntryPoint(EntryPoint $entryPoint)
+    public function addEntryPoint(EntryPointInterface $entryPoint)
     {
         $this->entryPoints[] = $entryPoint;
     }
