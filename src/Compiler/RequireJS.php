@@ -27,7 +27,7 @@ class RequireJS extends AbstractCompiler
             "<!-- JS for %s -->\n",
             $pageName
         );
-        $script .= $this->addScriptTag('/bundles/app/js/common/requirejs.js');
+        $script .= $this->addScriptTag('/bundles/app/js/common/requirejs.js', $config);
         $script .= "\n";
 
         // Entry point configuration
@@ -36,7 +36,7 @@ class RequireJS extends AbstractCompiler
         if (is_array($externals)) {
             foreach ($externals as $ep) {
                 if ($ep instanceof EntryPointFile) {
-                    $script .= $this->addScriptTag($ep->getPath());
+                    $script .= $this->addScriptTag($ep->getPath(), $config);
                     $script .= "\n";
                 }
             }
@@ -91,7 +91,7 @@ class RequireJS extends AbstractCompiler
             foreach ($aliases as $alias) {
                 $path = $alias->getPath();
                 if ($path !== null) {
-                    $data['paths'][$alias->getAlias()] = $path;
+                    $data['paths'][$alias->getAlias()] = $this->filterUrl($path, $config);
                 }
 
                 $shims = $alias->getShims();

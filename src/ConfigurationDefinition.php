@@ -11,6 +11,9 @@ use Visca\JsPackager\Configuration\ResourceJs as ResourceAlias;
  */
 class ConfigurationDefinition
 {
+    /** @var string */
+    private $currentEnvironment;
+
     /**
      * @var string Specified the public URL address of the output
      *             files when referenced in a browser.
@@ -19,6 +22,12 @@ class ConfigurationDefinition
 
     /** @var string Where to store output files */
     private $buildOutputPath;
+
+    /** @var string Domains to use in the paths of assets */
+    private $domainsInjection;
+
+    /** @var string Environment in which we want to inject the domains */
+    private $domainsInjectionEnvironment;
 
     /** @var EntryPoint[] */
     private $entryPoints = [];
@@ -31,6 +40,25 @@ class ConfigurationDefinition
 
     /** @var ResourceAlias[] */
     private $alias = [];
+
+    /**
+     * ConfigurationDefinition constructor.
+     *
+     * @param string $environment
+     */
+    public function __construct($environment)
+    {
+        $this->currentEnvironment = $environment;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentEnvironment()
+    {
+        return $this->currentEnvironment;
+    }
+
 
     /**
      * @return string
@@ -70,6 +98,22 @@ class ConfigurationDefinition
         $this->buildOutputPath = $buildOutputPath;
 
         return $this;
+    }
+
+    /**
+     * @param array $domains
+     */
+    public function setDomainsInjection($environment, $domains)
+    {
+        $this->domainsInjectionEnvironment = $environment;
+        $this->domainsInjection = $domains;
+
+        return $this;
+    }
+
+    public function getDomainsInjection()
+    {
+        return $this->domainsInjection;
     }
 
     /**
@@ -152,5 +196,13 @@ class ConfigurationDefinition
         $this->globalInline = $globalInline;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomainInjectionEnvironment()
+    {
+        return $this->domainsInjectionEnvironment;
     }
 }
