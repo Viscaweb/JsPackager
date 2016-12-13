@@ -14,6 +14,9 @@ use Visca\JsPackager\ConfigurationDefinition;
  */
 class WebpackConfig
 {
+    /** @var string */
+    protected $rootDir;
+
     /** @var Twig_Environment */
     protected $twig;
 
@@ -29,8 +32,9 @@ class WebpackConfig
      * @param Twig_Environment $twig
      * @param string           $templatePath  Path to config.js template
      */
-    public function __construct(Twig_Environment $twig, $templatePath/*, FileLocator $fileLocator*/)
+    public function __construct($rootDir, Twig_Environment $twig, $templatePath/*, FileLocator $fileLocator*/)
     {
+        $this->rootDir = dirname($rootDir);
         $this->twig = $twig;
         // pfff, i don't like this, but i can't find any other
         // way to pass '@' from yml
@@ -45,13 +49,11 @@ class WebpackConfig
      */
     public function compile(ConfigurationDefinition $config)
     {
-        $outputPath = '';
-
         // Module Alias
         // ------------
         $aliases = $config->getAlias();
         $alias = [];
-        $publicPath = rtrim($outputPath, '/');
+        $publicPath = rtrim($this->rootDir.'/web', '/');
         if (count($aliases) > 0) {
             foreach ($aliases as $resource) {
                 $path = $resource->getPath();
@@ -74,12 +76,40 @@ class WebpackConfig
 
         $entryPoints = [];
 
+        // Prepare GlobalInline content
+        $globalInlineEntryPoint = $config->getEntryPointsGlobalInline();
+        if (count($globalInlineEntryPoint) > 0) {
+            $entryPointGlobalToInline = '';
+            foreach ($globalInlineEntryPoint as $entryPoint) {
+                if ($entryPoint instanceof EntryPointContent) {
+                    $entryPointGlobalToInline.= $entryPoint->getContent();
+                }
+            }
+        }
+
         /** @var EntryPoint $entryPoint */
         foreach ($config->getEntryPoints() as $ep) {
 
             if ($ep instanceof EntryPointFile) {
                 $path = $ep->getPath();
+                if (!empty($entryPointGlobalToInline)) {
+                    if (file_exists($path)) {
+                        $content = file_get_contents($path);
+                        $epC = new EntryPointContent(
+                            $ep->getName(),
+                            $entryPointGlobalToInline."\n".
+                                $content
+                            );
+                        $path = $this->saveTemporalEntryPoint($epC);
+                    }
+                }
             } elseif ($ep instanceof EntryPointContent) {
+                if (!empty($entryPointGlobalToInline)) {
+                    $ep->setContent(
+                        $entryPointGlobalToInline."\n".$ep->getContent()
+                    );
+                }
+
                 $path = $this->saveTemporalEntryPoint($ep);
             }
 
@@ -123,5 +153,20 @@ class WebpackConfig
     {
         return '/Volumes/Develop/GitRepos/viscaweb/life/tmp';
         return sys_get_temp_dir();
+    }
+
+    /**
+     * @param string $base
+     * @param string $path
+     *
+     * @return string
+     */
+    private function getRelativePath($base, $path) {
+        // Detect directory separator
+        $separator = substr($base, 0, 1);
+        $base = array_slice(explode($separator, rtrim($base,$separator)),1);
+        $path = array_slice(explode($separator, rtrim($path,$separator)),1);
+
+        return $separator.implode($separator, array_slice($path, count($base)));
     }
 }

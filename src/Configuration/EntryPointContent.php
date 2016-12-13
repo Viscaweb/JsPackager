@@ -40,4 +40,11 @@ class EntryPointContent implements EntryPointInterface
     {
         return $this->content;
     }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
+
+        return $this;
+    }
 }
