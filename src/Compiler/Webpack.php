@@ -3,6 +3,7 @@
 namespace Visca\JsPackager\Compiler;
 
 use Visca\JsPackager\Compiler\Config\WebpackConfig;
+use Visca\JsPackager\Compiler\Url\UrlProcessor;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\UrlResolver;
 

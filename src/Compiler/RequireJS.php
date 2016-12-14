@@ -7,12 +7,26 @@ use Visca\JsPackager\Configuration\EntryPointFile;
 use Visca\JsPackager\Configuration\ResourceJs;
 use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
+use Visca\JsPackager\Compiler\Url\UrlProcessor;
 
 /**
  * Class RequireJSManager
  */
 class RequireJS extends AbstractCompiler
 {
+    /** @var UrlProcessor */
+    protected $urlProcessor;
+
+    /**
+     * AbstractCompiler constructor.
+     *
+     * @param UrlProcessor $urlProcessor
+     */
+    public function __construct(UrlProcessor $urlProcessor)
+    {
+        $this->urlProcessor = $urlProcessor;
+    }
+
     /**
      * @param string                  $pageName
      * @param ConfigurationDefinition $config
@@ -36,7 +50,7 @@ class RequireJS extends AbstractCompiler
         if (is_array($externals)) {
             foreach ($externals as $ep) {
                 if ($ep instanceof EntryPointFile) {
-                    $script .= $this->addScriptTag($ep->getPath(), $config);
+                    $script .= $this->addScriptTagExtended($ep->getPath(), $config);
                     $script .= "\n";
                 }
             }
@@ -91,7 +105,7 @@ class RequireJS extends AbstractCompiler
             foreach ($aliases as $alias) {
                 $path = $alias->getPath();
                 if ($path !== null) {
-                    $data['paths'][$alias->getAlias()] = $this->filterUrl($path, $config);
+                    $data['paths'][$alias->getAlias()] = $this->urlProcessor->processUrl($path, $config);
                 }
 
                 $shims = $alias->getShims();
@@ -114,5 +128,15 @@ class RequireJS extends AbstractCompiler
             ).');';
 
         return $script;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addScriptTagExtended($url, ConfigurationDefinition $config)
+    {
+        $url = $this->urlProcessor->processUrl($url, $config);
+
+        return parent::addScriptTag($url);
     }
 }
