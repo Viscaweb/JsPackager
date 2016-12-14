@@ -14,6 +14,7 @@ use Visca\JsPackager\ConfigurationDefinition;
  */
 class WebpackConfig
 {
+    const IMPORTS_LOADER = 'imports-loader';
     /** @var string */
     protected $rootDir;
 
@@ -65,7 +66,7 @@ class WebpackConfig
                             $shimCollection[] = $shim->getGlobalVariable().'='.$shim->getModuleName();
                         }
                     }
-                    $path = 'imports?'.implode('&', $shimCollection).'!'.$publicPath.$path;
+                    $path = self::IMPORTS_LOADER.'?'.implode('&', $shimCollection).'!'.$publicPath.$path;
                 } else {
                     $path = $publicPath.$path;
                 }
