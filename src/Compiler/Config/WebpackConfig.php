@@ -59,6 +59,7 @@ class WebpackConfig
             foreach ($aliases as $resource) {
                 $path = $resource->getPath();
                 $shims = $resource->getShims();
+                /* @TODO does not work totally... better put this in webpack.config.js instead.
                 if (count($shims) > 0) {
                     $shimCollection = [];
                     foreach ($shims as $shim) {
@@ -68,8 +69,9 @@ class WebpackConfig
                     }
                     $path = self::IMPORTS_LOADER.'?'.implode('&', $shimCollection).'!'.$publicPath.$path;
                 } else {
+                */
                     $path = $publicPath.$path;
-                }
+//                }
 
                 $alias[$resource->getAlias()] = $path;
             }
