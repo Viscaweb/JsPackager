@@ -37,7 +37,7 @@ class Webpack extends AbstractCompiler
     {
         $this->compileWebpackConfig($config);
 
-        return $this->compileJs($pageName);
+        return $this->compileJs($pageName, $config);
     }
 
     /**
@@ -57,7 +57,7 @@ class Webpack extends AbstractCompiler
     /**
      * @return string
      */
-    protected function compileJs($pageName)
+    protected function compileJs($pageName, $config)
     {
         $path = $this->getTemporalPath();
         $cmd =
@@ -68,11 +68,16 @@ class Webpack extends AbstractCompiler
         $return_var = [];
         $dd = exec($cmd, $output, $return_var);
 
+        $output = implode('', $output);
+        $jsonOutput = json_decode($output, true);
         // Analyze output
 //        $jsonOutput = json_decode($output, true);
 //        $assets = $this->getAssets($jsonOutput);
 
         $output = '';
+        foreach ($jsonOutput['assetsByChunkName'] as $asset) {
+            $output.= $this->addScriptTag('/js/min/'.$asset, $config);
+        }
 //        foreach ($assets as $url) {
 //            $output.= $this->addScriptTag($jsonOutput['publicPath'].'/'.$url);
 //        }
