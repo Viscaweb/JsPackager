@@ -102,7 +102,7 @@ class UrlProcessor
             $queryGlue = (strpos($url, '?') === false) ? '?' : '&';
 
             $extension = strpos($url, '.js');
-            $extension = ($extension == (strlen($url) - 3)) ? '.js' : '';
+            $extension = ($extension == (strlen($url) - 3)) ? '' : '.js';
             $url = $url.$extension.$queryGlue.'v='.md5($modifiedTime);
         }
 
