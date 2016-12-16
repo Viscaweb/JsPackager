@@ -114,6 +114,7 @@ class WebpackConfig
             [
                 'entryPoints' => $entryPoints,
                 'outputPath' => $config->getBuildOutputPath(),
+                'publicPath' => $config->getOutputPublicPath(),
                 'alias' => $wpAlias,
             ]
         );
