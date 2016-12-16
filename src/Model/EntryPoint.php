@@ -26,4 +26,20 @@ class EntryPoint
         $this->name = $name;
         $this->resource = $resource;
     }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return Resource
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
 }

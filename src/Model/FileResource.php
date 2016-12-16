@@ -25,7 +25,7 @@ class FileResource implements Resource
      */
     public function getContent()
     {
-        // TODO: Implement getContent() method.
+        return file_get_contents($this->path);
     }
 
     /**
