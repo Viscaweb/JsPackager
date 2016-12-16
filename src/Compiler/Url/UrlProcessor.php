@@ -81,13 +81,14 @@ class UrlProcessor
     protected function injectCacheBusting($url, ConfigurationDefinition $config)
     {
         $fileNameHash = md5($url);
-        $modifiedTime = $this->cacheStorage->fetch('modified.time.'.$fileNameHash);
+        $key = 'js.modified.time.';
+        $modifiedTime = $this->cacheStorage->fetch($key.$fileNameHash);
         if (!$modifiedTime) {
             $path = $this->publicPath.'/'.ltrim($url, '/');
 
             if (file_exists($path.'.js')) {
                 $modifiedTime = filemtime($path.'.js');
-                $this->cacheStorage->save('modified.time.'.$fileNameHash, $modifiedTime);
+                $this->cacheStorage->save($key.$fileNameHash, $modifiedTime);
             } elseif (is_dir($path)) {
                 throw new \RuntimeException(
                     sprintf('Cannot add cachebusting to alias pointing to folders (%s).', $url)
@@ -100,7 +101,9 @@ class UrlProcessor
         if ($modifiedTime !== null) {
             $queryGlue = (strpos($url, '?') === false) ? '?' : '&';
 
-            $url = $url.'.js'.$queryGlue.'v='.md5($modifiedTime);
+            $extension = strpos($url, '.js');
+            $extension = ($extension == (strlen($url) - 3)) ? '.js' : '';
+            $url = $url.$extension.$queryGlue.'v='.md5($modifiedTime);
         }
 
         return $url;
