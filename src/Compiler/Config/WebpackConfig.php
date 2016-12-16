@@ -4,9 +4,8 @@ namespace Visca\JsPackager\Compiler\Config;
 
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Twig_Environment;
-use Visca\JsPackager\Configuration\EntryPoint;
-use Visca\JsPackager\Configuration\EntryPointContent;
-use Visca\JsPackager\Configuration\Shim;
+use Visca\JsPackager\Model\EntryPoint;
+use Visca\JsPackager\Model\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
 
 /**
@@ -15,6 +14,7 @@ use Visca\JsPackager\ConfigurationDefinition;
 class WebpackConfig
 {
     const IMPORTS_LOADER = 'imports-loader';
+
     /** @var string */
     protected $rootDir;
 
@@ -30,17 +30,17 @@ class WebpackConfig
     /**
      * WebpackConfig constructor.
      *
+     * @param string           $rootDir
      * @param Twig_Environment $twig
      * @param string           $templatePath  Path to config.js template
      */
-    public function __construct($rootDir, Twig_Environment $twig, $templatePath/*, FileLocator $fileLocator*/)
+    public function __construct($rootDir, Twig_Environment $twig, $templatePath)
     {
         $this->rootDir = dirname($rootDir);
         $this->twig = $twig;
         // pfff, i don't like this, but i can't find any other
         // way to pass '@' from yml
         $this->templatePath = '@'.$templatePath;
-//        $this->fileLocator = $fileLocator;
     }
 
     /**
@@ -53,12 +53,13 @@ class WebpackConfig
         // Module Alias
         // ------------
         $aliases = $config->getAlias();
-        $alias = [];
+        $wpAlias = [];
         $publicPath = rtrim($this->rootDir.'/web', '/');
         if (count($aliases) > 0) {
-            foreach ($aliases as $resource) {
+            foreach ($aliases as $_alias) {
+                $resource = $_alias->getResource();
                 $path = $resource->getPath();
-                $shims = $resource->getShims();
+                $shims = $_alias->getShims();
                 /* @TODO does not work totally... better put this in webpack.config.js instead.
                 if (count($shims) > 0) {
                     $shimCollection = [];
@@ -73,7 +74,7 @@ class WebpackConfig
                     $path = $publicPath.$path;
 //                }
 
-                $alias[$resource->getAlias()] = $path;
+                $wpAlias[$_alias->getName()] = $path;
             }
         }
 
@@ -84,37 +85,22 @@ class WebpackConfig
         if (count($globalInlineEntryPoint) > 0) {
             $entryPointGlobalToInline = '';
             foreach ($globalInlineEntryPoint as $entryPoint) {
-                if ($entryPoint instanceof EntryPointContent) {
-                    $entryPointGlobalToInline.= $entryPoint->getContent();
-                }
+                $entryPointGlobalToInline.= $entryPoint->getResource()->getContent();
             }
         }
 
         /** @var EntryPoint $entryPoint */
         foreach ($config->getEntryPoints() as $ep) {
 
-            if ($ep instanceof EntryPointFile) {
-                $path = $ep->getPath();
-                if (!empty($entryPointGlobalToInline)) {
-                    if (file_exists($path)) {
-                        $content = file_get_contents($path);
-                        $epC = new EntryPointContent(
-                            $ep->getName(),
-                            $entryPointGlobalToInline."\n".
-                                $content
-                            );
-                        $path = $this->saveTemporalEntryPoint($epC);
-                    }
-                }
-            } elseif ($ep instanceof EntryPointContent) {
-                if (!empty($entryPointGlobalToInline)) {
-                    $ep->setContent(
-                        $entryPointGlobalToInline."\n".$ep->getContent()
-                    );
-                }
+            $resource = $ep->getResource();
 
-                $path = $this->saveTemporalEntryPoint($ep);
+            $content = '';
+            if (!empty($entryPointGlobalToInline)) {
+                $content.= $entryPointGlobalToInline;
             }
+            $content.= $resource->getContent();
+
+            $path = $this->saveTemporalEntryPoint($ep->getName(), $content);
 
             $entryPoints[] = [
                 'name' => $ep->getName(),
@@ -125,11 +111,10 @@ class WebpackConfig
 
         $output = $this->twig->render(
             $this->templatePath,
-//            'ViscaJsEntryPointBundle::webpack.config.sample.js.twig',
             [
                 'entryPoints' => $entryPoints,
                 'outputPath' => $config->getBuildOutputPath(),
-                'alias' => $alias,
+                'alias' => $wpAlias,
             ]
         );
 
@@ -141,13 +126,13 @@ class WebpackConfig
      *
      * @return string
      */
-    private function saveTemporalEntryPoint(EntryPointContent $entryPoint)
+    private function saveTemporalEntryPoint($entryPointName, $content)
     {
-        $filename = $entryPoint->getName().'.entry_point.js';
+        $filename = $entryPointName.'.entry_point.js';
 
         $path = $this->getTemporalPath().'/'.$filename;
 
-        file_put_contents($path, $entryPoint->getContent());
+        file_put_contents($path, $content);
 
         return $path;
     }

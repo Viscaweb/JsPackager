@@ -76,12 +76,15 @@ class Webpack extends AbstractCompiler
 //        $assets = $this->getAssets($jsonOutput);
 
         $output = '';
-        foreach ($jsonOutput['assetsByChunkName'] as $asset) {
-            $output.= $this->addScriptTag('/js/min/'.$asset, $config);
+        if (is_array($jsonOutput) && isset($jsonOutput['assetsByChunkName'])) {
+            foreach ($jsonOutput['assetsByChunkName'] as $asset) {
+                $output .= $this->addScriptTag('/js/min/'.$asset, $config);
+            }
+        } else {
+            throw new \RuntimeException(
+                'Could not compile JS with webpack.'
+            );
         }
-//        foreach ($assets as $url) {
-//            $output.= $this->addScriptTag($jsonOutput['publicPath'].'/'.$url);
-//        }
 
         return $output;
     }
