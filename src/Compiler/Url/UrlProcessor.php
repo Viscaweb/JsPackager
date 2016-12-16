@@ -3,7 +3,7 @@
 namespace Visca\JsPackager\Compiler\Url;
 
 use Visca\JsPackager\ConfigurationDefinition;
-use Doctrine\Common\Cache;
+use Doctrine\Common\Cache\Cache;
 use AppBundle\Cache\MemcachedCache;
 
 /**
@@ -20,17 +20,28 @@ class UrlProcessor
     /** @var string */
     protected $publicPath;
 
+    /** @var bool */
+    protected $cacheBustingEnabled;
+
     /**
      * UrlProcessor constructor.
      *
      * @param MemcachedCache $cacheStorage
      * @param string         $rootPath
      */
-    public function __construct(MemcachedCache $cacheStorage, $rootPath)
+    public function __construct(Cache $cacheStorage, $rootPath)
     {
         $this->cacheStorage = $cacheStorage;
         $this->publicPath = dirname($rootPath).'/web';
         $this->domainIterator = 0;
+    }
+
+    /**
+     * @param $enabled
+     */
+    public function setCacheBustingEnabled($enabled)
+    {
+        $this->cacheBustingEnabled = $enabled;
     }
 
     /**
@@ -43,7 +54,10 @@ class UrlProcessor
      */
     public function processUrl($url, ConfigurationDefinition $config)
     {
-        $url = $this->injectCacheBusting($url, $config);
+        if ($this->cacheBustingEnabled) {
+            $url = $this->injectCacheBusting($url, $config);
+        }
+
         $url = $this->injectDomain($url, $config);
 
         return $url;

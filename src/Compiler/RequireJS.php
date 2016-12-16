@@ -73,7 +73,7 @@ class RequireJS extends AbstractCompiler
             }
         }
         $script .= '</script>';
-
+        $script .= "\n";
         $script .= '<!-- END of JS -->';
 
         return $script;
@@ -103,7 +103,7 @@ class RequireJS extends AbstractCompiler
                 }
 
                 $shims = $alias->getShims();
-                if ($shims !== null && is_array($shims)) {
+                if (count($shims) > 0) {
                     $modules = [];
                     /** @var Shim $shim */
                     foreach ($shims as $shim) {
