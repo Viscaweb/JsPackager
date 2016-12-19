@@ -23,13 +23,13 @@ class ConfigurationDefinition
     /** @var string Where to store output files */
     private $buildOutputPath;
 
-    /** @var string Domains to use in the paths of assets */
+    /** @var string[] Domains to use in the paths of assets */
     private $domainsInjection;
 
     /** @var string Environment in which we want to inject the domains */
     private $domainsInjectionEnvironment;
 
-    /** @var EntryPoint[] */
+    /** @var EntryPointInterface[] */
     private $entryPoints = [];
 
     /** @var array */
@@ -58,7 +58,6 @@ class ConfigurationDefinition
     {
         return $this->currentEnvironment;
     }
-
 
     /**
      * @return string
@@ -101,7 +100,10 @@ class ConfigurationDefinition
     }
 
     /**
+     * @param       $environment
      * @param array $domains
+     *
+     * @return $this
      */
     public function setDomainsInjection($environment, $domains)
     {
@@ -111,6 +113,9 @@ class ConfigurationDefinition
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getDomainsInjection()
     {
         return $this->domainsInjection;
@@ -127,7 +132,7 @@ class ConfigurationDefinition
     }
 
     /**
-     * @return Configuration\EntryPoint[]
+     * @return EntryPointInterface[]
      */
     public function getEntryPoints()
     {

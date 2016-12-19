@@ -50,6 +50,9 @@ class UrlProcessor
     }
 
     /**
+     * This class will adds (only when required, for example when having many CDNs subdomains to preload assets)
+     * domains before the real assets URL.
+     *
      * @param string                  $url
      * @param ConfigurationDefinition $config
      *
@@ -63,9 +66,7 @@ class UrlProcessor
             if ($domainsCount > 0) {
                 $url = rtrim($domains[$this->domainIterator], '/').'/'.ltrim($url, '/');
 
-                $this->domainIterator = $this->domainIterator < ($domainsCount - 1)
-                    ? $this->domainIterator + 1
-                    : 0;
+                $this->domainIterator = $this->domainIterator < ($domainsCount - 1) ? $this->domainIterator + 1 : 0;
             }
         }
 
@@ -77,22 +78,21 @@ class UrlProcessor
      * @param ConfigurationDefinition $config
      *
      * @return string
+     * @throws \RuntimeException
      */
     protected function injectCacheBusting($url, ConfigurationDefinition $config)
     {
         $fileNameHash = md5($url);
-        $key = 'js.modified.time.';
-        $modifiedTime = $this->cacheStorage->fetch($key.$fileNameHash);
-        if (!$modifiedTime) {
-            $path = $this->publicPath.'/'.ltrim($url, '/');
+        $cacheKey = 'js.modified.time.' . $fileNameHash;
+        $modifiedTime = $this->cacheStorage->fetch($cacheKey);
 
-            if (file_exists($path.'.js')) {
-                $modifiedTime = filemtime($path.'.js');
-                $this->cacheStorage->save($key.$fileNameHash, $modifiedTime);
+        if (!$modifiedTime) {
+            $path = $this->publicPath . '/' . ltrim($url, '/');
+            if (file_exists($path . '.js')) {
+                $modifiedTime = filemtime($path . '.js');
+                $this->cacheStorage->save($cacheKey, $modifiedTime);
             } elseif (is_dir($path)) {
-                throw new \RuntimeException(
-                    sprintf('Cannot add cachebusting to alias pointing to folders (%s).', $url)
-                );
+                throw new \RuntimeException("Cannot add cache busting to alias pointing to folders ($url).");
             } else {
                 // Nothing found...
             }
@@ -103,7 +103,7 @@ class UrlProcessor
 
             $extension = strpos($url, '.js');
             $extension = ($extension == (strlen($url) - 3)) ? '' : '.js';
-            $url = $url.$extension.$queryGlue.'v='.md5($modifiedTime);
+            $url = $url . $extension . $queryGlue . 'v=' . md5($modifiedTime);
         }
 
         return $url;
