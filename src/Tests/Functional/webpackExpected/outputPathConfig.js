@@ -13,7 +13,7 @@ module.exports = {
         // The base directory (absolute path) for resolving
         // the entry option.
         path: '',
-        publicPath: 'js'
+        publicPath: 'js/'
     },
 
     resolve: {

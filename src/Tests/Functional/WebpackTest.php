@@ -52,6 +52,7 @@ class WebpackTest extends WebTestCase
     {
         $config = new ConfigurationDefinition('desktop');
         $config->setBuildOutputPath($this->temporalPath.'/build');
+        $config->setOutputPublicPath('/js/min/');
 
         $output = $this->compiler->compile('match', $config);
 
