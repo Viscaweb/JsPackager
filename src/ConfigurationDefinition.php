@@ -75,7 +75,7 @@ class ConfigurationDefinition
      */
     public function setOutputPublicPath($outputPublicPath)
     {
-        $this->outputPublicPath = $outputPublicPath;
+        $this->outputPublicPath = rtrim($outputPublicPath, '/').'/';
 
         return $this;
     }
