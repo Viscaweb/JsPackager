@@ -2,11 +2,15 @@
 
 namespace Visca\JsPackager\Tests\Functional;
 
+//use Assetic\Factory\Resource\FileResource;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Visca\JsPackager\Compiler\Config\WebpackConfig;
-use Visca\JsPackager\Configuration\EntryPoint;
+use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Configuration\ResourceJs;
-use Visca\JsPackager\Configuration\Shim;
+use Visca\JsPackager\Model\Shim;
+use Visca\JsPackager\Model\Alias;
+use Visca\JsPackager\Model\FileResource;
+use Visca\JsPackager\Model\StringResource;
 use Visca\JsPackager\ConfigurationDefinition;
 
 /**
@@ -23,15 +27,20 @@ class WebpackConfigTest extends WebTestCase
     /** @var string */
     protected $tempPath;
 
+    /** @var string */
+    protected $resourcesPath;
+
     public function setUp()
     {
         parent::setUp();
 
-        $this->tempPath = './../../Resources/temp/';
+        $this->resourcesPath = './../../Resources/';
+        $this->tempPath = $this->resourcesPath.'temp/';
         $this->twig = $this->getContainer()->get('twig');
 
-        $template = realpath(__DIR__.'/../../Resources/webpack.config.yml.dist');
-        $this->webpackConfig = new WebpackConfig($this->twig, $template, $this->tempPath);
+        $path = __DIR__.'/../../Resources/webpack.config.yml.dist';
+        $template = realpath($path);
+        $this->webpackConfig = new WebpackConfig('life/', $this->twig, $template, $this->tempPath);
     }
 
     /**
@@ -39,8 +48,7 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testEmptyConfig()
     {
-        $config = new ConfigurationDefinition();
-
+        $config = new ConfigurationDefinition('desktop');
 
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/emptyConfig.js');
@@ -53,7 +61,7 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testOutputPath()
     {
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
         $config->setOutputPublicPath('js');
 
         $output = $this->webpackConfig->compile($config);
@@ -67,12 +75,9 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testResolveAlias()
     {
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
 
-        $jquery = new ResourceJs();
-        $jquery
-            ->setAlias('jquery')
-            ->setPath('js/vendor/jquery.min.js');
+        $jquery = new Alias('jquery', new FileResource('js/vendor/jquery.min.js'));
 
         $config->addAlias($jquery);
 
@@ -88,27 +93,24 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testResolveAliasWithShim()
     {
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
 
-        $jquery = new ResourceJs();
-        $jquery
-            ->setAlias('jquery')
-            ->setPath('js/vendor/jquery.min.js');
+        $resource = new FileResource('js/vendor/jquery.min.js');
+        $jquery = new Alias('jquery', $resource);
         $config->addAlias($jquery);
 
         $shim = new Shim();
         $shim->setGlobalVariable('$')
             ->setModuleName('jquery');
 
-        $bootstrap = new ResourceJs();
-        $bootstrap
-            ->setAlias('bootstrap')
-            ->setPath('js/vendor/bootstrap.min.js')
-            ->setShims([$shim]);
+        $resource = new FileResource('js/vendor/bootstrap.min.js');
+        $bootstrap = new Alias('bootstrap', $resource, [$shim]);
         $config->addAlias($bootstrap);
 
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/resolveAliasWithShimConfig.js');
+
+
 
         $this->assertEquals($expected, $output);
     }
@@ -118,32 +120,29 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testEntryPointFromUrlConfig()
     {
-        $entryPoint = new EntryPoint();
-        $entryPoint
-            ->setName('matchPage')
-            ->setPath('js/pages/match.page.js');
-
-        $config = new ConfigurationDefinition();
+        $entryPoint = new EntryPoint('matchPage', new FileResource($this->resourcesPath.'fixtures/match.page.js'));
+        $config = new ConfigurationDefinition('desktop');
         $config->addEntryPoint($entryPoint);
 
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/entryPointConfig.js');
+
+        $expected = str_replace('<apath>', $this->webpackConfig->getTemporalPath().'/', $expected);
 
         $this->assertEquals($expected, $output);
     }
 
     public function testEntryPointFromContent()
     {
-        $entryPoint = new EntryPoint();
-        $entryPoint
-            ->setName('matchPage')
-            ->setContent('console.log(\'hello\');');
+        $entryPoint = new EntryPoint('matchPage', new StringResource('console.log(\'hello\');'));
 
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
         $config->addEntryPoint($entryPoint);
 
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/entryPointFromContentConfig.js');
+
+        $expected = str_replace('<apath>', $this->webpackConfig->getTemporalPath().'/', $expected);
 
         $this->assertEquals($expected, $output);
     }

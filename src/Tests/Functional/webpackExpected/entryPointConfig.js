@@ -4,7 +4,7 @@ module.exports = {
 
     // Entry points for the application
     entry : {
-                "matchPage": "js/pages/match.page.js"
+                "matchPage": "<apath>matchPage.entry_point.js"
             },
 
     output: {
@@ -13,7 +13,8 @@ module.exports = {
 
         // The base directory (absolute path) for resolving
         // the entry option.
-        path: ''
+        path: '',
+        publicPath: ''
     },
 
     resolve: {

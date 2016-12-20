@@ -40,7 +40,7 @@ class WebpackConfig
         $this->twig = $twig;
         // pfff, i don't like this, but i can't find any other
         // way to pass '@' from yml
-        $this->templatePath = '@'.$templatePath;
+        $this->templatePath = $templatePath;
     }
 
     /**
@@ -58,7 +58,7 @@ class WebpackConfig
         if (count($aliases) > 0) {
             foreach ($aliases as $_alias) {
                 $resource = $_alias->getResource();
-                $path = $resource->getPath();
+                $path = ltrim($resource->getPath(), '/');
                 $shims = $_alias->getShims();
                 /* @TODO does not work totally... better put this in webpack.config.js instead.
                 if (count($shims) > 0) {
@@ -71,7 +71,7 @@ class WebpackConfig
                     $path = self::IMPORTS_LOADER.'?'.implode('&', $shimCollection).'!'.$publicPath.$path;
                 } else {
                 */
-                    $path = $publicPath.$path;
+                    $path = $publicPath.'/'.$path;
 //                }
 
                 $wpAlias[$_alias->getName()] = $path;
@@ -138,7 +138,7 @@ class WebpackConfig
         return $path;
     }
 
-    private function getTemporalPath()
+    public function getTemporalPath()
     {
         return '/Volumes/Develop/GitRepos/viscaweb/life/tmp';
         return sys_get_temp_dir();

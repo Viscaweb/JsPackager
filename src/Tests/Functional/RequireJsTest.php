@@ -40,8 +40,9 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
     {
         $config = new ConfigurationDefinition('desktop');
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/emptyConfig.js');
 
@@ -53,8 +54,8 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
         $config = new ConfigurationDefinition('desktop');
         $config->setOutputPublicPath('/web/');
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/baseUrl.js');
 
@@ -73,8 +74,8 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
         $jquery = new Alias('jquery', $resource);
         $config->addAlias($jquery);
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/alias.js');
 
@@ -97,8 +98,8 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
 
         $config->addAlias($bootstrap);
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/shim.js');
 
@@ -118,8 +119,8 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
         $config = new ConfigurationDefinition('desktop');
         $config->addEntryPoint($entryPoint);
 
-
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/entryPoints.js');
 
