@@ -1,5 +1,6 @@
 <!-- JS for xxx -->
-<script src="bundles/app/js/common/requirejs.js"></script><script>requirejs.config({
+<script src="/bundles/app/js/common/requirejs.js"></script>
+<script>requirejs.config({
     "paths": {
         "bootstrap": "js/bootstrap.min.js"
     },
@@ -10,4 +11,6 @@
             ]
         }
     }
-});</script><!-- END of JS -->
+});
+</script>
+<!-- END of JS -->

@@ -12,12 +12,13 @@ module.exports = {
 
         // The base directory (absolute path) for resolving
         // the entry option.
-        path: ''
+        path: '',
+        publicPath: ''
     },
 
     resolve: {
         alias: {
-    "jquery": "js/vendor/jquery.min.js"
+    "jquery": "./web/js/vendor/jquery.min.js"
 }
     },
 

@@ -2,11 +2,16 @@
 
 namespace Visca\JsPackager\Tests;
 
+use Doctrine\Common\Cache\VoidCache;
 use PHPUnit_Framework_TestCase;
-use Visca\JsPackager\Configuration\EntryPoint;
-use Visca\JsPackager\Configuration\ResourceJs;
+use Visca\JsPackager\Compiler\Url\UrlProcessor;
+use Visca\JsPackager\Model\EntryPoint;
+use Visca\JsPackager\Model\Alias;
+use Visca\JsPackager\Model\FileResource;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Compiler\RequireJS;
+use Visca\JsPackager\Model\Shim;
+use Visca\JsPackager\Model\StringResource;
 
 
 /**
@@ -23,7 +28,9 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->compiler = new RequireJS();
+        $urlProcessor = new UrlProcessor(new VoidCache(), '');
+        $urlProcessor->setCacheBustingEnabled(false);
+        $this->compiler = new RequireJS($urlProcessor);
     }
 
     /**
@@ -31,10 +38,11 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
      */
     public function testEmptyConfig()
     {
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/emptyConfig.js');
 
@@ -43,11 +51,11 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
 
     public function testBaseUrl()
     {
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
         $config->setOutputPublicPath('/web/');
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/baseUrl.js');
 
@@ -59,16 +67,15 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
      */
     public function testAlias()
     {
-        $config = new ConfigurationDefinition();
-        
-        $jquery = new ResourceJs();
-        $jquery->setAlias('jquery');
-        $jquery->setPath('js/jquery.min.js');
-        
+        $config = new ConfigurationDefinition('desktop');
+
+        $resource = new FileResource('js/jquery.min.js');
+
+        $jquery = new Alias('jquery', $resource);
         $config->addAlias($jquery);
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/alias.js');
 
@@ -80,18 +87,19 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
      */
     public function testShim()
     {
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
 
-        $bootstrap = new ResourceJs();
-        $bootstrap
-            ->setAlias('bootstrap')
-            ->setPath('js/bootstrap.min.js')
-            ->setShims(['jquery']);
+        $resource = new FileResource('js/bootstrap.min.js');
+        $shim = new Shim();
+        $shim->setGlobalVariable('$')
+            ->setModuleName('jquery');
+
+        $bootstrap = new Alias('bootstrap', $resource, [$shim]);
 
         $config->addAlias($bootstrap);
 
-        $pageName = 'xxx';
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/shim.js');
 
@@ -105,15 +113,14 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
     {
         $pageName = 'xxx';
 
-        $entryPoint = new EntryPoint();
-        $entryPoint->setName($pageName);
-        $entryPoint->setContent('console.log(\'hello\');');
+        $resource = new StringResource('console.log(\'hello\');');
+        $entryPoint = new EntryPoint($pageName, $resource);
 
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
         $config->addEntryPoint($entryPoint);
 
-
-        $output = $this->compiler->compile($pageName, $config);
+        $entryPoint = new EntryPoint('xxx', new StringResource(''));
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $expected = file_get_contents(__DIR__.'/requireJsExpected/entryPoints.js');
 

@@ -2,6 +2,7 @@
 namespace Visca\JsPackager\Compiler;
 
 use Visca\JsPackager\ConfigurationDefinition;
+use Visca\JsPackager\Model\EntryPoint;
 
 /**
  * Interface CompilerInterface
@@ -10,10 +11,10 @@ use Visca\JsPackager\ConfigurationDefinition;
 interface CompilerInterface
 {
     /**
-     * @param string $pageName
+     * @param EntryPoint|EntryPoint[] $entryPoints
      * @param ConfigurationDefinition $config
      *
      * @return string
      */
-    public function compile($pageName, ConfigurationDefinition $config);
+    public function compile($entryPoints, ConfigurationDefinition $config);
 }

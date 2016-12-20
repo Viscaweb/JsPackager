@@ -2,9 +2,9 @@
 
 namespace Visca\JsPackager;
 
-use Visca\JsPackager\Configuration\EntryPoint;
 use Visca\JsPackager\Configuration\EntryPointInterface;
-use Visca\JsPackager\Configuration\ResourceJs as ResourceAlias;
+use Visca\JsPackager\Model\EntryPoint;
+use Visca\JsPackager\Model\Alias;
 
 /**
  * Class ConfigurationDefinition
@@ -29,7 +29,7 @@ class ConfigurationDefinition
     /** @var string Environment in which we want to inject the domains */
     private $domainsInjectionEnvironment;
 
-    /** @var EntryPointInterface[] */
+    /** @var EntryPoint[] */
     private $entryPoints = [];
 
     /** @var array */
@@ -38,7 +38,7 @@ class ConfigurationDefinition
     /** @var array */
     private $globalInclude = [];
 
-    /** @var ResourceAlias[] */
+    /** @var Alias[] */
     private $alias = [];
 
     /**
@@ -74,7 +74,7 @@ class ConfigurationDefinition
      */
     public function setOutputPublicPath($outputPublicPath)
     {
-        $this->outputPublicPath = $outputPublicPath;
+        $this->outputPublicPath = rtrim($outputPublicPath, '/').'/';
 
         return $this;
     }
@@ -124,15 +124,15 @@ class ConfigurationDefinition
     /**
      * Adds a new entry point to be processed.
      *
-     * @param EntryPointInterface $entryPoint
+     * @param EntryPoint $entryPoint
      */
-    public function addEntryPoint(EntryPointInterface $entryPoint)
+    public function addEntryPoint(EntryPoint $entryPoint)
     {
         $this->entryPoints[] = $entryPoint;
     }
 
     /**
-     * @return EntryPointInterface[]
+     * @return EntryPoint[]
      */
     public function getEntryPoints()
     {
@@ -140,9 +140,9 @@ class ConfigurationDefinition
     }
 
     /**
-     * @param ResourceAlias $alias
+     * @param Alias $alias
      */
-    public function addAlias(ResourceAlias $alias)
+    public function addAlias(Alias $alias)
     {
         $this->alias[] = $alias;
     }
@@ -161,7 +161,7 @@ class ConfigurationDefinition
      *
      * <script src="<url>"></script>
      *
-     * @return array
+     * @return EntryPoint[]
      */
     public function getEntryPointsGlobalIncludes()
     {
@@ -184,7 +184,7 @@ class ConfigurationDefinition
      * Returns a list of Javascript paths that is intended to be appended
      * inline into the designed entry point.
      *
-     * @return array
+     * @return EntryPoint[]
      */
     public function getEntryPointsGlobalInline()
     {

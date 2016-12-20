@@ -5,8 +5,9 @@ namespace Visca\JsPackager\Tests\Functional;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Visca\JsPackager\Compiler\Config\WebpackConfig;
 use Visca\JsPackager\Compiler\Webpack;
-use Visca\JsPackager\Configuration\EntryPoint;
+use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\ConfigurationDefinition;
+use Visca\JsPackager\Model\StringResource;
 use Visca\JsPackager\UrlResolver;
 
 /**
@@ -36,7 +37,7 @@ class WebpackTest extends WebTestCase
         $twig = $this->getContainer()->get('twig');
         $this->urlResolver = new UrlResolver($twig);
 
-        $this->webpackConfig = new WebpackConfig($twig, $template, $this->temporalPath);
+        $this->webpackConfig = new WebpackConfig('life', $twig, $template, $this->temporalPath);
         $this->compiler = new Webpack(
             $this->webpackConfig,
             $this->temporalPath,
@@ -49,12 +50,12 @@ class WebpackTest extends WebTestCase
      */
     public function testEmptyConfig()
     {
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
         $config->setBuildOutputPath($this->temporalPath.'/build');
 
         $output = $this->compiler->compile('match', $config);
 
-        $this->assertEquals('<script src="/commons.js"></script>', $output);
+        $this->assertEquals('<script src="/js/min/commons.js"></script>', $output);
     }
 
     /**
@@ -62,19 +63,18 @@ class WebpackTest extends WebTestCase
      */
     public function testContentEntryPoint()
     {
-        $entryPoint = new EntryPoint();
-        $entryPoint->setName('match')
-            ->setContent('console.log(\'hello match\');');
+        $entryPoint = new EntryPoint('match', new StringResource('console.log(\'hello match\');'));
 
-        $config = new ConfigurationDefinition();
+        $config = new ConfigurationDefinition('desktop');
+        $config->setOutputPublicPath('/js/min');
         $config->setBuildOutputPath($this->temporalPath.'/build');
         $config->addEntryPoint($entryPoint);
 
-        $output = $this->compiler->compile('match', $config);
+        $output = $this->compiler->compile($entryPoint, $config);
 
         $this->assertEquals(
-            '<script src="/commons.js"></script>'.
-            '<script src="/match.dist.js"></script>',
+            '<script src="/js/min/commons.js"></script>'.
+            '<script src="/js/min/match.dist.js"></script>',
             $output
         );
     }

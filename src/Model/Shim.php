@@ -1,6 +1,6 @@
 <?php
 
-namespace Visca\JsPackager\Configuration;
+namespace Visca\JsPackager\Model;
 
 /**
  * Class Shim.

@@ -4,8 +4,8 @@ namespace Visca\JsPackager\Compiler;
 
 use Visca\JsPackager\Configuration\EntryPointContent;
 use Visca\JsPackager\Configuration\EntryPointFile;
-use Visca\JsPackager\Configuration\ResourceJs;
-use Visca\JsPackager\Configuration\Shim;
+use Visca\JsPackager\Model\Alias;
+use Visca\JsPackager\Model\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
 
@@ -28,13 +28,16 @@ class RequireJS extends AbstractCompiler
     }
 
     /**
-     * @param string                  $pageName
-     * @param ConfigurationDefinition $config
-     *
-     * @return string
+     * @note This packager does not support processing multiple entry points at once.
+     * {@inheritdoc}
      */
-    public function compile($pageName, ConfigurationDefinition $config)
+    public function compile($entryPoints, ConfigurationDefinition $config)
     {
+        if (is_array($entryPoints)) {
+            throw new \RuntimeException('RequireJS packager does not support processing multiple entrypoints at once.');
+        }
+
+        $pageName = $entryPoints->getName();
         $this->debug = true;
 
         $script = sprintf(
@@ -49,37 +52,31 @@ class RequireJS extends AbstractCompiler
         $externals = $config->getEntryPointsGlobalIncludes();
         if (is_array($externals)) {
             foreach ($externals as $ep) {
-                if ($ep instanceof EntryPointFile) {
-                    $script .= $this->addScriptTagExtended($ep->getPath(), $config);
-                    $script .= "\n";
-                }
+                $script .= $this->addScriptTagExtended($ep->getResource()->getPath(), $config);
+                $script .= "\n";
             }
         }
 
         $script .= '<script>';
 
-        // Include RequireJS inline configuration
+//         Include RequireJS inline configuration
         $script .= $this->compileRequireJsConfig($config)."\n";
 
         // Include inline Javascript page entry point
         foreach ($config->getEntryPointsGlobalInline() as $ep) {
-            if ($ep instanceof EntryPointContent) {
-                $script .= $ep->getContent()."\n";
-            }
+            $script .= $ep->getResource()->getContent()."\n";
         }
 
 
         foreach ($config->getEntryPoints() as $ep) {
             if ($ep->getName() == $pageName) {
 
-                if ($ep instanceof EntryPointContent) {
-                    $script .= $ep->getContent();
-                    $script .= "\n";
-                }
+                $script .= $ep->getResource()->getContent();
+                $script .= "\n";
             }
         }
         $script .= '</script>';
-
+        $script .= "\n";
         $script .= '<!-- END of JS -->';
 
         return $script;
@@ -101,22 +98,22 @@ class RequireJS extends AbstractCompiler
 
         $aliases = $config->getAlias();
         if (is_array($aliases)) {
-            /** @var ResourceJs $alias */
+            /** @var Alias $alias */
             foreach ($aliases as $alias) {
-                $path = $alias->getPath();
+                $path = $alias->getResource()->getPath();
                 if ($path !== null) {
-                    $data['paths'][$alias->getAlias()] = $this->urlProcessor->processUrl($path, $config);
+                    $data['paths'][$alias->getName()] = $this->urlProcessor->processUrl($path, $config);
                 }
 
                 $shims = $alias->getShims();
-                if ($shims !== null && is_array($shims)) {
+                if (count($shims) > 0) {
                     $modules = [];
                     /** @var Shim $shim */
                     foreach ($shims as $shim) {
                         $modules[] = $shim->getModuleName();
                     }
 
-                    $data['shim'][$alias->getAlias()] = ['deps' => $modules];
+                    $data['shim'][$alias->getName()] = ['deps' => $modules];
                 }
             }
         }
