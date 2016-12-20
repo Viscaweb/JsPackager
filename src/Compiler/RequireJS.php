@@ -28,13 +28,16 @@ class RequireJS extends AbstractCompiler
     }
 
     /**
-     * @param string                  $pageName
-     * @param ConfigurationDefinition $config
-     *
-     * @return string
+     * @note This packager does not support processing multiple entry points at once.
+     * {@inheritdoc}
      */
-    public function compile($pageName, ConfigurationDefinition $config)
+    public function compile($entryPoints, ConfigurationDefinition $config)
     {
+        if (is_array($entryPoints)) {
+            throw new \RuntimeException('RequireJS packager does not support processing multiple entrypoints at once.');
+        }
+
+        $pageName = $entryPoints->getName();
         $this->debug = true;
 
         $script = sprintf(

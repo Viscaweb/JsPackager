@@ -29,16 +29,13 @@ class Webpack extends AbstractCompiler
     }
 
     /**
-     * @param string                  $pageName
-     * @param ConfigurationDefinition $config
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function compile($pageName, ConfigurationDefinition $config)
+    public function compile($entryPoints, ConfigurationDefinition $config)
     {
         $this->compileWebpackConfig($config);
 
-        return $this->compileJs($pageName, $config);
+        return $this->doCompilation($config);
     }
 
     /**
@@ -58,7 +55,7 @@ class Webpack extends AbstractCompiler
     /**
      * @return string
      */
-    protected function compileJs($pageName, $config)
+    protected function doCompilation($config)
     {
         $path = $this->getTemporalPath();
         $cmd =
@@ -77,8 +74,25 @@ class Webpack extends AbstractCompiler
 
         $output = '';
         if (is_array($jsonOutput) && isset($jsonOutput['assetsByChunkName'])) {
+
+            // Check if there is any "commons.js" generated output.
+            // Favour loading it as the first asset.
+            if (isset($jsonOutput['assetsByChunkName']['commons.js'])) {
+                $output .= $this->addScriptTag(
+                    $config->getOutputPublicPath().$jsonOutput['assetsByChunkName']['commons.js'],
+                    $config
+                );
+
+                unset($jsonOutput['assetsByChunkName']['commons.js']);
+            }
+
+
+
             foreach ($jsonOutput['assetsByChunkName'] as $asset) {
-                $output .= $this->addScriptTag('/js/min/'.$asset, $config);
+                $output .= $this->addScriptTag(
+                    $config->getOutputPublicPath().$asset,
+                    $config
+                );
             }
         } else {
             throw new \RuntimeException(
