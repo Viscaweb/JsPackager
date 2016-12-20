@@ -5,6 +5,7 @@ namespace Visca\JsPackager\Compiler;
 use Visca\JsPackager\Compiler\Config\WebpackConfig;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
 use Visca\JsPackager\ConfigurationDefinition;
+use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\UrlResolver;
 
 /**
@@ -35,7 +36,7 @@ class Webpack extends AbstractCompiler
     {
         $this->compileWebpackConfig($config);
 
-        return $this->doCompilation($config);
+        return $this->doCompilation($entryPoints, $config);
     }
 
     /**
@@ -53,9 +54,12 @@ class Webpack extends AbstractCompiler
     }
 
     /**
+     * @param EntryPoint|EntryPoint[] $entryPoints Desired entry points to output.
+     * @param ConfigurationDefinition $config      Configuration Definition.
+     *
      * @return string
      */
-    protected function doCompilation($config)
+    protected function doCompilation($entryPoints, $config)
     {
         $path = $this->getTemporalPath();
         $cmd =
@@ -66,11 +70,9 @@ class Webpack extends AbstractCompiler
         $return_var = [];
         $dd = exec($cmd, $output, $return_var);
 
+        // Analyze output
         $output = implode('', $output);
         $jsonOutput = json_decode($output, true);
-        // Analyze output
-//        $jsonOutput = json_decode($output, true);
-//        $assets = $this->getAssets($jsonOutput);
 
         $output = '';
         if (is_array($jsonOutput) && isset($jsonOutput['assetsByChunkName'])) {
@@ -86,13 +88,25 @@ class Webpack extends AbstractCompiler
                 unset($jsonOutput['assetsByChunkName']['commons.js']);
             }
 
-
-
-            foreach ($jsonOutput['assetsByChunkName'] as $asset) {
-                $output .= $this->addScriptTag(
-                    $config->getOutputPublicPath().$asset,
-                    $config
+            // Build desired entrypoints
+            if (is_array($entryPoints)) {
+                $desiredEntryPoints = array_map(
+                    function (EntryPoint $ep) {
+                        return $ep->getName();
+                    },
+                    $entryPoints
                 );
+            } else {
+                $desiredEntryPoints = [$entryPoints->getName()];
+            }
+
+            foreach ($jsonOutput['assetsByChunkName'] as $chunkName => $asset) {
+                if (in_array($chunkName, $desiredEntryPoints)) {
+                    $output .= $this->addScriptTag(
+                        $config->getOutputPublicPath().$asset,
+                        $config
+                    );
+                }
             }
         } else {
             throw new \RuntimeException(

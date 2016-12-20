@@ -27,6 +27,9 @@ class WebpackTest extends WebTestCase
     /** @var Webpack */
     private $compiler;
 
+    /** @var ConfigurationDefinition */
+    private $config;
+
     public function setUp()
     {
         parent::setUp();
@@ -43,6 +46,10 @@ class WebpackTest extends WebTestCase
             $this->temporalPath,
             $this->urlResolver
         );
+
+        $this->config = new ConfigurationDefinition('desktop');
+        $this->config->setBuildOutputPath($this->temporalPath.'/build');
+        $this->config->setOutputPublicPath('/js/min/');
     }
 
     /**
@@ -50,11 +57,10 @@ class WebpackTest extends WebTestCase
      */
     public function testEmptyConfig()
     {
-        $config = new ConfigurationDefinition('desktop');
-        $config->setBuildOutputPath($this->temporalPath.'/build');
-        $config->setOutputPublicPath('/js/min/');
-
-        $output = $this->compiler->compile('match', $config);
+        $output = $this->compiler->compile(
+            new EntryPoint('null', new StringResource('')),
+            $this->config
+        );
 
         $this->assertEquals('<script src="/js/min/commons.js"></script>', $output);
     }
@@ -66,17 +72,41 @@ class WebpackTest extends WebTestCase
     {
         $entryPoint = new EntryPoint('match', new StringResource('console.log(\'hello match\');'));
 
-        $config = new ConfigurationDefinition('desktop');
-        $config->setOutputPublicPath('/js/min');
-        $config->setBuildOutputPath($this->temporalPath.'/build');
-        $config->addEntryPoint($entryPoint);
+        $this->config->addEntryPoint($entryPoint);
 
-        $output = $this->compiler->compile($entryPoint, $config);
+        $output = $this->compiler->compile($entryPoint, $this->config);
 
         $this->assertEquals(
             '<script src="/js/min/commons.js"></script>'.
             '<script src="/js/min/match.dist.js"></script>',
             $output
         );
+    }
+
+    /**
+     * Tests that defining multiple entry points.
+     */
+    public function testMultipleEntryPoints()
+    {
+        $epHome = new EntryPoint(
+            'home',
+            new StringResource('console.log(\'hello home\');')
+        );
+
+        $epContact = new EntryPoint(
+            'contact',
+            new StringResource('console.log(\'hello contact\');')
+        );
+
+        $this->config->addEntryPoint($epHome);
+        $this->config->addEntryPoint($epContact);
+
+        $output = $this->compiler->compile($epHome, $this->config);
+
+        $expected =
+            '<script src="/js/min/commons.js"></script>'.
+            '<script src="/js/min/home.dist.js"></script>';
+
+        $this->assertEquals($expected, $output);
     }
 }
