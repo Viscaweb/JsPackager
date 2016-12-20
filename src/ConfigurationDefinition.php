@@ -2,7 +2,6 @@
 
 namespace Visca\JsPackager;
 
-use Visca\JsPackager\Configuration\EntryPointInterface;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Model\Alias;
 
