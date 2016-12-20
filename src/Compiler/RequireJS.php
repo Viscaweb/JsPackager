@@ -28,6 +28,14 @@ class RequireJS extends AbstractCompiler
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'requirejs';
+    }
+
+    /**
      * @note This packager does not support processing multiple entry points at once.
      * {@inheritdoc}
      */

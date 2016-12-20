@@ -11,6 +11,11 @@ use Visca\JsPackager\Model\EntryPoint;
 interface CompilerInterface
 {
     /**
+     * @return string
+     */
+    public function getName();
+
+    /**
      * @param EntryPoint|EntryPoint[] $entryPoints
      * @param ConfigurationDefinition $config
      *

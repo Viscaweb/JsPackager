@@ -4,7 +4,6 @@ namespace Visca\JsPackager\Compiler\Url;
 
 use Visca\JsPackager\ConfigurationDefinition;
 use Doctrine\Common\Cache\Cache;
-use AppBundle\Cache\MemcachedCache;
 
 /**
  * Class UrlProcessor
@@ -14,7 +13,7 @@ class UrlProcessor
     /** @var int */
     protected $domainIterator;
 
-    /** @var MemcachedCache */
+    /** @var Cache */
     protected $cacheStorage;
 
     /** @var string */

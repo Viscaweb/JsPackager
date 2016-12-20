@@ -32,6 +32,14 @@ class Webpack extends AbstractCompiler
     /**
      * {@inheritdoc}
      */
+    public function getName()
+    {
+        return 'webpack';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function compile($entryPoints, ConfigurationDefinition $config)
     {
         $this->compileWebpackConfig($config);
