@@ -7,5 +7,21 @@ namespace Visca\JsPackager\Model;
  */
 class PackageStats
 {
+    /**
+     * @var string[]
+     */
+    private $assetsBuilt;
 
+    public function __construct($assetsBuilt)
+    {
+        $this->assetsBuilt = $assetsBuilt;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getAssetsBuilt()
+    {
+        return $this->assetsBuilt;
+    }
 }
