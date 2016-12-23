@@ -4,7 +4,7 @@ module.exports = {
 
     // Entry points for the application
     entry : {
-                "matchPage": "<apath>matchPage.entry_point.js"
+                "matchPage": "%outputPath%/matchPage.entry_point.js"
             },
 
     output: {

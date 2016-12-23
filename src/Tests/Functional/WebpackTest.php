@@ -34,17 +34,28 @@ class WebpackTest extends WebTestCase
     {
         parent::setUp();
 
+        $path = __DIR__;
+        $this->twig = $this->getContainer()->get('twig');
+
+        $this->resourcesPath = realpath($path.'/../../Resources');
+        $this->rootPath = realpath($path.'/../../Resources/tmp');
+
+
+
+
         $this->temporalPath = __DIR__.'/../../Resources/temp';
         $template = realpath(__DIR__.'/../../Resources/webpack.config.yml.dist');
         /** @var Twig_Environment $twig */
         $twig = $this->getContainer()->get('twig');
         $this->urlResolver = new UrlResolver($twig);
 
-        $this->webpackConfig = new WebpackConfig('life', $twig, $template, $this->temporalPath);
+        $this->webpackConfig = new WebpackConfig(
+            $twig,
+            $this->rootPath,
+            $template
+        );
         $this->compiler = new Webpack(
-            $this->webpackConfig,
-            $this->temporalPath,
-            $this->urlResolver
+            $this->webpackConfig
         );
 
         $this->config = new ConfigurationDefinition('desktop');
@@ -62,7 +73,7 @@ class WebpackTest extends WebTestCase
             $this->config
         );
 
-        $this->assertEquals('<script src="/js/min/commons.js"></script>', $output);
+        $this->assertEquals('', $output);
     }
 
     /**
@@ -77,7 +88,6 @@ class WebpackTest extends WebTestCase
         $output = $this->compiler->compile($entryPoint, $this->config);
 
         $this->assertEquals(
-            '<script src="/js/min/commons.js"></script>'.
             '<script src="/js/min/match.dist.js"></script>',
             $output
         );
@@ -104,7 +114,6 @@ class WebpackTest extends WebTestCase
         $output = $this->compiler->compile($epHome, $this->config);
 
         $expected =
-            '<script src="/js/min/commons.js"></script>'.
             '<script src="/js/min/home.dist.js"></script>';
 
         $this->assertEquals($expected, $output);

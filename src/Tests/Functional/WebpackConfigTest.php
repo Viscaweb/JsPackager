@@ -25,22 +25,26 @@ class WebpackConfigTest extends WebTestCase
     protected $webpackConfig;
 
     /** @var string */
-    protected $tempPath;
+    protected $resourcesPath;
 
     /** @var string */
-    protected $resourcesPath;
+    protected $rootPath;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->resourcesPath = './../../Resources/';
-        $this->tempPath = $this->resourcesPath.'temp/';
+        $path = __DIR__;
         $this->twig = $this->getContainer()->get('twig');
 
-        $path = __DIR__.'/../../Resources/webpack.config.yml.dist';
-        $template = realpath($path);
-        $this->webpackConfig = new WebpackConfig('life/', $this->twig, $template, $this->tempPath);
+        $this->resourcesPath = realpath($path.'/../../Resources');
+        $this->rootPath = realpath($path.'/../../Resources/tmp');
+
+        $this->webpackConfig = new WebpackConfig(
+            $this->twig,
+            $this->rootPath,
+            realpath($this->resourcesPath.'/webpack.config.yml.dist')
+        );
     }
 
     /**
@@ -84,6 +88,12 @@ class WebpackConfigTest extends WebTestCase
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/resolveAliasConfig.js');
 
+        $expected = str_replace(
+            '%rootPath%',
+            $this->resourcesPath,
+            $expected
+        );
+
         $this->assertEquals($expected, $output);
     }
 
@@ -110,7 +120,11 @@ class WebpackConfigTest extends WebTestCase
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/resolveAliasWithShimConfig.js');
 
-
+        $expected = str_replace(
+            '%rootPath%',
+            $this->resourcesPath,
+            $expected
+        );
 
         $this->assertEquals($expected, $output);
     }
@@ -120,14 +134,18 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testEntryPointFromUrlConfig()
     {
-        $entryPoint = new EntryPoint('matchPage', new FileResource($this->resourcesPath.'fixtures/match.page.js'));
+        $entryPoint = new EntryPoint('matchPage', new FileResource($this->resourcesPath.'/fixtures/match.page.js'));
         $config = new ConfigurationDefinition('desktop');
         $config->addEntryPoint($entryPoint);
 
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/entryPointConfig.js');
 
-        $expected = str_replace('<apath>', $this->webpackConfig->getTemporalPath().'/', $expected);
+        $expected = str_replace(
+            '%outputPath%',
+            $this->webpackConfig->getTemporalPath(),
+            $expected
+        );
 
         $this->assertEquals($expected, $output);
     }
@@ -142,7 +160,11 @@ class WebpackConfigTest extends WebTestCase
         $output = $this->webpackConfig->compile($config);
         $expected = file_get_contents(__DIR__.'/webpackExpected/entryPointFromContentConfig.js');
 
-        $expected = str_replace('<apath>', $this->webpackConfig->getTemporalPath().'/', $expected);
+        $expected = str_replace(
+            '%outputPath%',
+            $this->webpackConfig->getTemporalPath(),
+            $expected
+        );
 
         $this->assertEquals($expected, $output);
     }
