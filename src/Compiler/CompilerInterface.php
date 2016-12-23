@@ -22,4 +22,9 @@ interface CompilerInterface
      * @return string
      */
     public function compile($entryPoints, ConfigurationDefinition $config);
+
+    /**
+     * @return PackageStats
+     */
+    public function getStats();
 }

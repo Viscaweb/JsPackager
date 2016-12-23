@@ -6,6 +6,7 @@ use Visca\JsPackager\Compiler\Config\WebpackConfig;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Model\EntryPoint;
+use Visca\JsPackager\Model\PackageStats;
 use Visca\JsPackager\UrlResolver;
 
 /**
@@ -15,6 +16,9 @@ class Webpack extends AbstractCompiler
 {
     /** @var WebpackConfig */
     protected $webpackConfig;
+
+    /** @var PackageStats */
+    protected $lastStats;
 
     /**
      * Webpack constructor.
@@ -81,6 +85,7 @@ class Webpack extends AbstractCompiler
         // Analyze output
         $output = implode('', $output);
         $jsonOutput = json_decode($output, true);
+        $this->processStats($jsonOutput, $config);
 
         $output = '';
         if (is_array($jsonOutput) && isset($jsonOutput['assetsByChunkName'])) {
@@ -148,5 +153,28 @@ class Webpack extends AbstractCompiler
 //        return sys_get_temp_dir();
 
         return '/Volumes/Develop/GitRepos/viscaweb/life/tmp';
+    /**
+     *
+     */
+    private function processStats($jsonStats, ConfigurationDefinition $config)
+    {
+        $assetsBuilt = [];
+        if ( isset($jsonStats['assetsByChunkName'])) {
+            foreach ($jsonStats['assetsByChunkName'] as $name => $asset) {
+                $assetsBuilt[$name] = $config->getOutputPublicPath().$asset;
+            }
+        }
+
+        $this->lastStats = new PackageStats(
+            $assetsBuilt
+        );
+    }
+
+    /**
+     *
+     */
+    public function getStats()
+    {
+        return $this->lastStats;
     }
 }

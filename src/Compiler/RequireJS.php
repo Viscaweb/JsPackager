@@ -5,6 +5,7 @@ namespace Visca\JsPackager\Compiler;
 use Visca\JsPackager\Configuration\EntryPointContent;
 use Visca\JsPackager\Configuration\EntryPointFile;
 use Visca\JsPackager\Model\Alias;
+use Visca\JsPackager\Model\PackageStats;
 use Visca\JsPackager\Model\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
@@ -143,5 +144,13 @@ class RequireJS extends AbstractCompiler
         $url = $this->urlProcessor->processUrl($url, $config);
 
         return parent::addScriptTag($url);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStats()
+    {
+        return new PackageStats([]);
     }
 }
