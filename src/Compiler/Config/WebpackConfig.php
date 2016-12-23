@@ -34,7 +34,7 @@ class WebpackConfig
      * @param Twig_Environment $twig
      * @param string           $templatePath  Path to config.js template
      */
-    public function __construct($rootDir, Twig_Environment $twig, $templatePath)
+    public function __construct(Twig_Environment $twig, $rootDir, $templatePath)
     {
         $this->rootDir = dirname($rootDir);
         $this->twig = $twig;
@@ -119,7 +119,11 @@ class WebpackConfig
             ]
         );
 
-        return $output;
+        $path = $this->getTemporalPath().'/webpack.config.js';
+
+        file_put_contents($path, $output);
+
+        return $path;
     }
 
     /**
@@ -140,8 +144,8 @@ class WebpackConfig
 
     public function getTemporalPath()
     {
-        return '/Volumes/Develop/GitRepos/viscaweb/life/tmp';
-        return sys_get_temp_dir();
+        return $this->rootDir.'/tmp';
+//        return sys_get_temp_dir();
     }
 
     /**

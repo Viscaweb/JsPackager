@@ -58,11 +58,7 @@ class Webpack extends AbstractCompiler
      */
     protected function compileWebpackConfig(ConfigurationDefinition $config)
     {
-        $webpackConfig = $this->webpackConfig->compile($config);
-
-        $path = $this->getTemporalPath();
-
-        file_put_contents($path.'/webpack.config.js', $webpackConfig);
+        $webpackConfigPath = $this->webpackConfig->compile($config);
     }
 
     /**
@@ -73,7 +69,7 @@ class Webpack extends AbstractCompiler
      */
     protected function doCompilation($entryPoints, $config)
     {
-        $path = $this->getTemporalPath();
+        $path = $this->webpackConfig->getTemporalPath();
         $cmd =
             '/Volumes/Develop/GitRepos/viscaweb/life/'.
             'node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
@@ -148,11 +144,6 @@ class Webpack extends AbstractCompiler
         return $assets;
     }
 
-    private function getTemporalPath()
-    {
-//        return sys_get_temp_dir();
-
-        return '/Volumes/Develop/GitRepos/viscaweb/life/tmp';
     /**
      *
      */
