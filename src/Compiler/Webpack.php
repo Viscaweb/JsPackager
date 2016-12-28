@@ -156,8 +156,14 @@ class Webpack extends AbstractCompiler
             }
         }
 
+        $errors = [];
+        if (isset($jsonStats['errors']) && count($jsonStats['errors'])) {
+            $errors[] = $jsonStats['errors'];
+        }
+
         $this->lastStats = new PackageStats(
-            $assetsBuilt
+            $assetsBuilt,
+            $errors
         );
     }
 
