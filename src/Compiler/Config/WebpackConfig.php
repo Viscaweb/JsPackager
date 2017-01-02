@@ -4,6 +4,7 @@ namespace Visca\JsPackager\Compiler\Config;
 
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Twig_Environment;
+use Visca\JsPackager\Model\AliasResource;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Model\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
@@ -93,6 +94,15 @@ class WebpackConfig
         foreach ($config->getEntryPoints() as $ep) {
 
             $resource = $ep->getResource();
+
+            if ($resource instanceof AliasResource) {
+                $entryPoints[] = [
+                    'name' => $ep->getName(),
+                    'aliases' => $resource->getPath()
+                ];
+
+                continue;
+            }
 
             $content = '';
             if (!empty($entryPointGlobalToInline)) {
