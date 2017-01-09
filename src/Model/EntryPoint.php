@@ -15,16 +15,21 @@ class EntryPoint
     /** @var Resource */
     protected $resource;
 
+    /** @var UrlResource[] */
+    protected $externalResources;
+
     /**
      * EntryPoint constructor.
      *
-     * @param string   $name
-     * @param Resource $resource
+     * @param string        $name
+     * @param Resource      $resource
+     * @param UrlResource[] $externalResources Scripts that will be loaded in addition to the Resource. Mainly used to include scripts that are required to be included with extra script tags from external servers.
      */
-    public function __construct($name, Resource $resource)
+    public function __construct($name, Resource $resource, array $externalResources = [])
     {
         $this->name = $name;
         $this->resource = $resource;
+        $this->externalResources = $externalResources;
     }
 
     /**
@@ -41,5 +46,13 @@ class EntryPoint
     public function getResource()
     {
         return $this->resource;
+    }
+
+    /**
+     * @return UrlResource[]
+     */
+    public function getExternalResources()
+    {
+        return $this->externalResources;
     }
 }
