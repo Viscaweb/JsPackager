@@ -66,6 +66,13 @@ class RequireJS extends AbstractCompiler
             }
         }
 
+        // See if entry point requires external dependencies
+        foreach ($config->getEntryPoints() as $ep) {
+            foreach ($ep->getExternalResources() as $urlResource) {
+                $script .= '<script type="text/javascript" src="'.$urlResource->getUrl().'"></script>';
+            }
+        }
+
         $script .= '<script>';
 
 //         Include RequireJS inline configuration

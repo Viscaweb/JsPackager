@@ -65,7 +65,10 @@ class Webpack extends AbstractCompiler
      * @param EntryPoint|EntryPoint[] $entryPoints Desired entry points to output.
      * @param ConfigurationDefinition $config      Configuration Definition.
      *
-     * @return string
+     * @return string  Returns the <script> tags to output.
+     *                 If $entryPoints is an array, it will return a string
+     *                 array indexed by entryPoint names with the <script>
+     *                 tags result of every one of them.
      */
     protected function doCompilation($entryPoints, $config)
     {
@@ -83,45 +86,80 @@ class Webpack extends AbstractCompiler
         $jsonOutput = json_decode($output, true);
         $this->processStats($jsonOutput, $config);
 
-        $output = '';
-        if (is_array($jsonOutput) && isset($jsonOutput['assetsByChunkName'])) {
+//        $output = '';
 
-            // Check if there is any "commons.js" generated output.
-            // Favour loading it as the first asset.
-            if (isset($jsonOutput['assetsByChunkName']['commons.js'])) {
-                $output .= $this->addScriptTag(
-                    $config->getOutputPublicPath().$jsonOutput['assetsByChunkName']['commons.js'],
-                    $config
-                );
+        if (!is_array($jsonOutput) || !isset($jsonOutput['assetsByChunkName'])) {
+            throw new \RuntimeException(
+                'Could not compile JS with webpack.'
+            );
+        }
 
-                unset($jsonOutput['assetsByChunkName']['commons.js']);
+        $arrayMode = is_array($entryPoints);
+        if (!$arrayMode) {
+            $entryPoints = [$entryPoints];
+        }
+
+        // Check if there is any "commons.js" generated output.
+        // Favour loading it as the first asset.
+        $vendorAssets = $this->getVendorAssets($jsonOutput);
+
+
+        $output = [];
+        foreach ($entryPoints as $entryPoint) {
+            $key = $entryPoint->getName();
+            $output[$key] = '';
+
+            // Add external scripts if defined in the EntryPoint.
+            $externalAssets = $entryPoint->getExternalResources();
+            if (count($externalAssets) > 0) {
+                foreach ($externalAssets as $script) {
+                    $output[$key].= $this->addScriptTag($script->getUrl());
+                }
             }
 
-            // Build desired entrypoints
-            if (is_array($entryPoints)) {
-                $desiredEntryPoints = array_map(
-                    function (EntryPoint $ep) {
-                        return $ep->getName();
-                    },
-                    $entryPoints
-                );
-            } else {
-                $desiredEntryPoints = [$entryPoints->getName()];
-            }
-
-            foreach ($jsonOutput['assetsByChunkName'] as $chunkName => $asset) {
-                if (in_array($chunkName, $desiredEntryPoints)) {
-                    $output .= $this->addScriptTag(
+            if (count($vendorAssets) > 0) {
+                foreach ($vendorAssets as $asset) {
+                    $output[$key].= $this->addScriptTag(
                         $config->getOutputPublicPath().$asset,
                         $config
                     );
                 }
             }
-        } else {
-            throw new \RuntimeException(
-                'Could not compile JS with webpack.'
-            );
+
+            foreach ($jsonOutput['assetsByChunkName'] as $chunkName => $asset) {
+                if ($chunkName == $key) {
+                    $output[$key] .= $this->addScriptTag(
+                        $config->getOutputPublicPath().$asset,
+                        $config
+                    );
+                }
+            }
         }
+
+        return $arrayMode ? $output : $output[$entryPoints[0]->getName()];
+
+/*
+
+        // Build desired entrypoints
+        if (is_array($entryPoints)) {
+            $desiredEntryPoints = array_map(
+                function (EntryPoint $ep) {
+                    return $ep->getName();
+                },
+                $entryPoints
+            );
+        } else {
+            $desiredEntryPoints = [$entryPoints->getName()];
+        }
+
+        foreach ($jsonOutput['assetsByChunkName'] as $chunkName => $asset) {
+            if (in_array($chunkName, $desiredEntryPoints)) {
+                $output .= $this->addScriptTag(
+                    $config->getOutputPublicPath().$asset,
+                    $config
+                );
+            }
+        }*/
 
         return $output;
     }
@@ -145,12 +183,42 @@ class Webpack extends AbstractCompiler
     }
 
     /**
+     * @param $stats
+     *
+     * @return array
+     */
+    protected function getVendorAssets($stats)
+    {
+        if (!isset($stats['assetsByChunkName'])) {
+            return [];
+        }
+
+        $keys = array_keys($stats['assetsByChunkName']);
+        $vendorKeys = array_filter(
+            $keys,
+            function ($item) {
+                //vendor;
+                return (substr($item, 0, 6) === 'vendor');
+            }
+        );
+
+        $vendorAssets = [];
+        foreach ($vendorKeys as $key) {
+            $vendorAssets[$key] = $stats['assetsByChunkName'][$key];
+        }
+
+        ksort($vendorAssets);
+
+        return $vendorAssets;
+    }
+
+    /**
      *
      */
     private function processStats($jsonStats, ConfigurationDefinition $config)
     {
         $assetsBuilt = [];
-        if ( isset($jsonStats['assetsByChunkName'])) {
+        if (isset($jsonStats['assetsByChunkName'])) {
             foreach ($jsonStats['assetsByChunkName'] as $name => $asset) {
                 $assetsBuilt[$name] = $config->getOutputPublicPath().$asset;
             }
