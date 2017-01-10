@@ -133,7 +133,7 @@ class Webpack extends AbstractCompiler
             foreach ($stats->getAssetsBuilt() as $chunkName => $asset) {
                 if ($chunkName == $key) {
                     $output[$key] .= $this->addScriptTag(
-                        $config->getOutputPublicPath().$asset,
+                        $asset,
                         $config
                     );
                 }
