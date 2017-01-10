@@ -88,7 +88,7 @@ class Webpack extends AbstractCompiler
         // Analyze output
         $output = implode('', $output);
         $jsonOutput = json_decode($output, true);
-        $this->processStats($jsonOutput, $config);
+        $stats = $this->processStats($jsonOutput, $config);
 
 //        $output = '';
 
@@ -130,7 +130,7 @@ class Webpack extends AbstractCompiler
                 }
             }
 
-            foreach ($jsonOutput['assetsByChunkName'] as $chunkName => $asset) {
+            foreach ($stats->getAssetsBuilt() as $chunkName => $asset) {
                 if ($chunkName == $key) {
                     $output[$key] .= $this->addScriptTag(
                         $config->getOutputPublicPath().$asset,
@@ -183,7 +183,13 @@ class Webpack extends AbstractCompiler
 
         $vendorAssets = [];
         foreach ($vendorKeys as $key) {
-            $vendorAssets[$key] = $stats['assetsByChunkName'][$key];
+            $asset = $stats['assetsByChunkName'][$key];
+            if (is_array($asset)) {
+                // We may have generated source-maps, webpack groups them by filename.
+                $asset = $asset[0];
+            }
+
+            $vendorAssets[$key] = $asset;
         }
 
         ksort($vendorAssets);
@@ -199,7 +205,16 @@ class Webpack extends AbstractCompiler
         $assetsBuilt = [];
         if (isset($jsonStats['assetsByChunkName'])) {
             foreach ($jsonStats['assetsByChunkName'] as $name => $asset) {
-                $assetsBuilt[$name] = $config->getOutputPublicPath().$asset;
+
+                $path = '';
+                if (is_string($asset)) {
+                    $path = $asset;
+                } elseif (is_array($asset)) {
+                    // We may have generated source-maps, paths are grouped.
+                    $path = $asset[0];
+                }
+
+                $assetsBuilt[$name] = $config->getOutputPublicPath().$path;
             }
         }
 
@@ -212,6 +227,8 @@ class Webpack extends AbstractCompiler
             $assetsBuilt,
             $errors
         );
+
+        return $this->lastStats;
     }
 
     /**
