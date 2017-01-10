@@ -72,11 +72,15 @@ class Webpack extends AbstractCompiler
      */
     protected function doCompilation($entryPoints, $config)
     {
+        // Clear output path
+        $this->clearOutputPath($config);
+
+
         $path = $this->webpackConfig->getTemporalPath();
         $cmd =
             '/Volumes/Develop/GitRepos/viscaweb/life/'.
             'node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
-//        $output = shell_exec('webpack --json --config '.$path.'/webpack.config.js');
+
         $output = [];
         $return_var = [];
         $dd = exec($cmd, $output, $return_var);
@@ -113,13 +117,13 @@ class Webpack extends AbstractCompiler
             $externalAssets = $entryPoint->getExternalResources();
             if (count($externalAssets) > 0) {
                 foreach ($externalAssets as $script) {
-                    $output[$key].= $this->addScriptTag($script->getUrl());
+                    $output[$key] .= $this->addScriptTag($script->getUrl());
                 }
             }
 
             if (count($vendorAssets) > 0) {
                 foreach ($vendorAssets as $asset) {
-                    $output[$key].= $this->addScriptTag(
+                    $output[$key] .= $this->addScriptTag(
                         $config->getOutputPublicPath().$asset,
                         $config
                     );
@@ -137,31 +141,6 @@ class Webpack extends AbstractCompiler
         }
 
         return $arrayMode ? $output : $output[$entryPoints[0]->getName()];
-
-/*
-
-        // Build desired entrypoints
-        if (is_array($entryPoints)) {
-            $desiredEntryPoints = array_map(
-                function (EntryPoint $ep) {
-                    return $ep->getName();
-                },
-                $entryPoints
-            );
-        } else {
-            $desiredEntryPoints = [$entryPoints->getName()];
-        }
-
-        foreach ($jsonOutput['assetsByChunkName'] as $chunkName => $asset) {
-            if (in_array($chunkName, $desiredEntryPoints)) {
-                $output .= $this->addScriptTag(
-                    $config->getOutputPublicPath().$asset,
-                    $config
-                );
-            }
-        }*/
-
-        return $output;
     }
 
     /**
@@ -233,6 +212,21 @@ class Webpack extends AbstractCompiler
             $assetsBuilt,
             $errors
         );
+    }
+
+    /**
+     * @param ConfigurationDefinition $config
+     */
+    private function clearOutputPath(ConfigurationDefinition $config)
+    {
+        $path = $config->getBuildOutputPath();
+
+        $files = glob($path.'/*'); // get all file names
+        foreach ($files as $file) { // iterate files
+            if (is_file($file)) {
+                unlink($file);
+            } // delete file
+        }
     }
 
     /**
