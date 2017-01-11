@@ -16,12 +16,21 @@ interface CompilerInterface
     public function getName();
 
     /**
-     * @param EntryPoint|EntryPoint[] $entryPoints
+     * @param EntryPoint              $entryPoint
      * @param ConfigurationDefinition $config
+     * @param string|null             $requiredPageName The page's javascript we want.
      *
      * @return string
      */
-    public function compile($entryPoints, ConfigurationDefinition $config);
+    public function compile(EntryPoint $entryPoint, ConfigurationDefinition $config);
+
+    /**
+     * @param EntryPoint[]            $entryPoints
+     * @param ConfigurationDefinition $config
+     *
+     * @return array
+     */
+    public function compileCollection(ConfigurationDefinition $config);
 
     /**
      * @return PackageStats

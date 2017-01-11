@@ -41,14 +41,19 @@ class Webpack extends AbstractCompiler
         return 'webpack';
     }
 
+    public function compile(EntryPoint $entryPoint, ConfigurationDefinition $config)
+    {
+        throw new \RuntimeException('Webpack does not allow compiling just an entry point.');
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function compile($entryPoints, ConfigurationDefinition $config)
+    public function compileCollection(ConfigurationDefinition $config)
     {
         $this->compileWebpackConfig($config);
 
-        return $this->doCompilation($entryPoints, $config);
+        return $this->doCompilation($config);
     }
 
     /**
@@ -62,7 +67,6 @@ class Webpack extends AbstractCompiler
     }
 
     /**
-     * @param EntryPoint|EntryPoint[] $entryPoints Desired entry points to output.
      * @param ConfigurationDefinition $config      Configuration Definition.
      *
      * @return string  Returns the <script> tags to output.
@@ -70,7 +74,7 @@ class Webpack extends AbstractCompiler
      *                 array indexed by entryPoint names with the <script>
      *                 tags result of every one of them.
      */
-    protected function doCompilation($entryPoints, $config)
+    protected function doCompilation($config)
     {
         // Clear output path
         $this->clearOutputPath($config);
@@ -98,10 +102,7 @@ class Webpack extends AbstractCompiler
             );
         }
 
-        $arrayMode = is_array($entryPoints);
-        if (!$arrayMode) {
-            $entryPoints = [$entryPoints];
-        }
+        $entryPoints = $config->getEntryPoints();
 
         // Check if there is any "commons.js" generated output.
         // Favour loading it as the first asset.
@@ -140,7 +141,7 @@ class Webpack extends AbstractCompiler
             }
         }
 
-        return $arrayMode ? $output : $output[$entryPoints[0]->getName()];
+        return $output;
     }
 
     /**

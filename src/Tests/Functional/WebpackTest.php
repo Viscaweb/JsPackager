@@ -40,9 +40,6 @@ class WebpackTest extends WebTestCase
         $this->resourcesPath = realpath($path.'/../../Resources');
         $this->rootPath = realpath($path.'/../../Resources/tmp');
 
-
-
-
         $this->temporalPath = __DIR__.'/../../Resources/temp';
         $template = realpath(__DIR__.'/../../Resources/webpack.config.yml.dist');
         /** @var Twig_Environment $twig */
@@ -68,12 +65,9 @@ class WebpackTest extends WebTestCase
      */
     public function testEmptyConfig()
     {
-        $output = $this->compiler->compile(
-            new EntryPoint('null', new StringResource('')),
-            $this->config
-        );
+        $output = $this->compiler->compileCollection($this->config);
 
-        $this->assertEquals('', $output);
+        $this->assertCount(0, $output);
     }
 
     /**
@@ -85,11 +79,11 @@ class WebpackTest extends WebTestCase
 
         $this->config->addEntryPoint($entryPoint);
 
-        $output = $this->compiler->compile($entryPoint, $this->config);
+        $output = $this->compiler->compileCollection($this->config);
 
         $this->assertEquals(
             '<script src="/js/min/match.dist.js"></script>',
-            $output
+            $output['match']
         );
     }
 
@@ -111,11 +105,9 @@ class WebpackTest extends WebTestCase
         $this->config->addEntryPoint($epHome);
         $this->config->addEntryPoint($epContact);
 
-        $output = $this->compiler->compile($epHome, $this->config);
+        $output = $this->compiler->compileCollection($this->config);
 
-        $expected =
-            '<script src="/js/min/home.dist.js"></script>';
-
-        $this->assertEquals($expected, $output);
+        $this->assertEquals('<script src="/js/min/home.dist.js"></script>', $output['home']);
+        $this->assertEquals('<script src="/js/min/contact.dist.js"></script>', $output['contact']);
     }
 }

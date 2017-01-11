@@ -2,11 +2,10 @@
 
 namespace Visca\JsPackager\Compiler;
 
-use Visca\JsPackager\Configuration\EntryPointContent;
-use Visca\JsPackager\Configuration\EntryPointFile;
 use Visca\JsPackager\Model\Alias;
 use Visca\JsPackager\Model\PackageStats;
 use Visca\JsPackager\Model\Shim;
+use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
 
@@ -37,16 +36,11 @@ class RequireJS extends AbstractCompiler
     }
 
     /**
-     * @note This packager does not support processing multiple entry points at once.
      * {@inheritdoc}
      */
-    public function compile($entryPoints, ConfigurationDefinition $config)
+    public function compile(EntryPoint $entryPoint, ConfigurationDefinition $config)
     {
-        if (is_array($entryPoints)) {
-            throw new \RuntimeException('RequireJS packager does not support processing multiple entrypoints at once.');
-        }
-
-        $pageName = $entryPoints->getName();
+        $pageName = $entryPoint->getName();
         $this->debug = true;
 
         $script = sprintf(
@@ -99,6 +93,14 @@ class RequireJS extends AbstractCompiler
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function compileCollection(ConfigurationDefinition $config)
+    {
+        throw new \RuntimeException('RequireJS packager does not support processing multiple entrypoints at once.');
+    }
+
+    /**
      * @param ConfigurationDefinition $config
      *
      * @return string
@@ -118,7 +120,9 @@ class RequireJS extends AbstractCompiler
             foreach ($aliases as $alias) {
                 $path = $alias->getResource()->getPath();
                 if ($path !== null) {
-                    $data['paths'][$alias->getName()] = $this->urlProcessor->processUrl($path, $config);
+                    $aliasName = $alias->getName();
+                    $aliasName = str_replace('$', '', $aliasName);
+                    $data['paths'][$aliasName] = $this->urlProcessor->processUrl($path, $config);
                 }
 
                 $shims = $alias->getShims();
