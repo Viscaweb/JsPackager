@@ -47,7 +47,7 @@ class WebpackCacheable implements CompilerInterface
             return $this->cache->fetch($cacheKey);
         }
 
-        return '';
+        throw new \RuntimeException('WebpackCacheable couldn\'t find cache entry for "'.$cacheKey.'"');
     }
 
     public function compileCollection(ConfigurationDefinition $config)
