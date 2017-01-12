@@ -138,6 +138,8 @@ class RequireJS extends AbstractCompiler
             }
         }
 
+        $data['waitSeconds'] = 15;
+
         $script =
             'requirejs.config('.json_encode(
                 $data,
