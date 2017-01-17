@@ -57,10 +57,10 @@ class WebpackConfig
         $wpAlias = [];
         $publicPath = rtrim($this->rootDir.'/web', '/');
         if (count($aliases) > 0) {
-            foreach ($aliases as $_alias) {
-                $resource = $_alias->getResource();
+            foreach ($aliases as $alias) {
+                $resource = $alias->getResource();
                 $path = ltrim($resource->getPath(), '/');
-                $shims = $_alias->getShims();
+                $shims = $alias->getShims();
                 /* @TODO does not work totally... better put this in webpack.config.js instead.
                 if (count($shims) > 0) {
                     $shimCollection = [];
@@ -75,7 +75,7 @@ class WebpackConfig
                     $path = $publicPath.'/'.$path;
 //                }
 
-                $wpAlias[$_alias->getName()] = $path;
+                $wpAlias[$alias->getName()] = $path;
             }
         }
 
@@ -154,8 +154,8 @@ class WebpackConfig
 
     public function getTemporalPath()
     {
-        return $this->rootDir.'/tmp';
-//        return sys_get_temp_dir();
+//        return $this->rootDir.'/tmp';
+        return sys_get_temp_dir();
     }
 
     /**
