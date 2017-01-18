@@ -159,7 +159,12 @@ class WebpackConfig
 
     public function getTemporalPath()
     {
-//        return $this->rootDir.'/tmp';
+        if ($this->temporalPath !== null) {
+            if (!is_dir($this->temporalPath)) {
+                mkdir($this->temporalPath, 0777, true);
+            }
+        }
+
         return $this->temporalPath === null
             ? sys_get_temp_dir()
             : $this->temporalPath;

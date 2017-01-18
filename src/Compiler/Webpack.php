@@ -14,6 +14,9 @@ use Visca\JsPackager\UrlResolver;
  */
 class Webpack extends AbstractCompiler
 {
+    /** @var string */
+    protected $rootDir;
+
     /** @var WebpackConfig */
     protected $webpackConfig;
 
@@ -27,9 +30,10 @@ class Webpack extends AbstractCompiler
      * @param string        $temporalPath
      * @param bool          $debug
      */
-    public function __construct(WebpackConfig $webpackConfig, $debug = false)
+    public function __construct(WebpackConfig $webpackConfig, $rootDir, $debug = false)
     {
         $this->webpackConfig = $webpackConfig;
+        $this->rootDir = dirname(rtrim($rootDir, '/'));
         $this->setDebug($debug);
     }
 
@@ -82,8 +86,9 @@ class Webpack extends AbstractCompiler
 
         $path = $this->webpackConfig->getTemporalPath();
         $cmd =
-            '/Volumes/Develop/GitRepos/viscaweb/life/'.
-            'node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
+            // Be sure our node_modules folder is available by node
+            'export NODE_PATH=\''.$this->rootDir.'/node_modules/\' && '.
+            $this->rootDir.'/node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
 
         $output = [];
         $return_var = [];
