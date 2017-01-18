@@ -54,7 +54,8 @@ class WebpackConfigTest extends WebTestCase
     {
         $config = new ConfigurationDefinition('desktop');
 
-        $output = $this->webpackConfig->compile($config);
+        $outputPath = $this->webpackConfig->compile($config);
+        $output = file_get_contents($outputPath);
         $expected = file_get_contents(__DIR__.'/webpackExpected/emptyConfig.js');
 
         $this->assertEquals($expected, $output);
@@ -68,7 +69,8 @@ class WebpackConfigTest extends WebTestCase
         $config = new ConfigurationDefinition('desktop');
         $config->setOutputPublicPath('js');
 
-        $output = $this->webpackConfig->compile($config);
+        $outputPath = $this->webpackConfig->compile($config);
+        $output = file_get_contents($outputPath);
         $expected = file_get_contents(__DIR__.'/webpackExpected/outputPathConfig.js');
 
         $this->assertEquals($expected, $output);
@@ -85,7 +87,8 @@ class WebpackConfigTest extends WebTestCase
 
         $config->addAlias($jquery);
 
-        $output = $this->webpackConfig->compile($config);
+        $outputPath = $this->webpackConfig->compile($config);
+        $output = file_get_contents($outputPath);
         $expected = file_get_contents(__DIR__.'/webpackExpected/resolveAliasConfig.js');
 
         $expected = str_replace(
@@ -117,7 +120,8 @@ class WebpackConfigTest extends WebTestCase
         $bootstrap = new Alias('bootstrap', $resource, [$shim]);
         $config->addAlias($bootstrap);
 
-        $output = $this->webpackConfig->compile($config);
+        $outputPath = $this->webpackConfig->compile($config);
+        $output = file_get_contents($outputPath);
         $expected = file_get_contents(__DIR__.'/webpackExpected/resolveAliasWithShimConfig.js');
 
         $expected = str_replace(
@@ -138,7 +142,8 @@ class WebpackConfigTest extends WebTestCase
         $config = new ConfigurationDefinition('desktop');
         $config->addEntryPoint($entryPoint);
 
-        $output = $this->webpackConfig->compile($config);
+        $outputPath = $this->webpackConfig->compile($config);
+        $output = file_get_contents($outputPath);
         $expected = file_get_contents(__DIR__.'/webpackExpected/entryPointConfig.js');
 
         $expected = str_replace(
@@ -157,7 +162,8 @@ class WebpackConfigTest extends WebTestCase
         $config = new ConfigurationDefinition('desktop');
         $config->addEntryPoint($entryPoint);
 
-        $output = $this->webpackConfig->compile($config);
+        $outputPath = $this->webpackConfig->compile($config);
+        $output = file_get_contents($outputPath);
         $expected = file_get_contents(__DIR__.'/webpackExpected/entryPointFromContentConfig.js');
 
         $expected = str_replace(

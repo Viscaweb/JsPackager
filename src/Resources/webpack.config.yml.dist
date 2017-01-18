@@ -26,20 +26,20 @@ module.exports = {
         alias: {{ alias|json_encode(constant('JSON_PRETTY_PRINT')+constant('JSON_UNESCAPED_SLASHES'))|raw }}
     },
 
-//    module: {
-//        loaders: [
+    module: {
+        loaders: [
             // Disable AMD @todo To check.
-//            { test: /\.js/, loader: 'imports?define=>false'},
-//            {
-//                test: /bootstrap/,
-//                loader: "imports?$=jquery"
-//            }
-//        ]
-//    },
+            { test: /\.js/, loader: 'imports?define=>false'},
+            {
+                test: /bootstrap/,
+                loader: "imports?$=jquery"
+            }
+        ]
+    },
 
     plugins: [
         new webpack.optimize.DedupePlugin(),
-        // new webpack.optimize.CommonsChunkPlugin("commons.js", ['jquery']),
-        // new webpack.optimize.UglifyJsPlugin()
+        new webpack.optimize.CommonsChunkPlugin("commons.js", ['jquery']),
+        //new webpack.optimize.UglifyJsPlugin()
     ]
 };
