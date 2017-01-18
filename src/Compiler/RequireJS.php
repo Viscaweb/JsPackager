@@ -111,7 +111,9 @@ class RequireJS extends AbstractCompiler
 
         $outputPublicPath = $config->getOutputPublicPath();
         if ($outputPublicPath !== null) {
-            $data['baseUrl'] = '/'.trim($outputPublicPath, '/').'/';
+            $outputPublicPath = trim($outputPublicPath, '/');
+
+            $data['baseUrl'] = empty($outputPublicPath) ? '/' : '/'.$outputPublicPath.'/';
         }
 
         $aliases = $config->getAlias();

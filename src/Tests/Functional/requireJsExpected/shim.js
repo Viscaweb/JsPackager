@@ -10,7 +10,8 @@
                 "jquery"
             ]
         }
-    }
+    },
+    "waitSeconds": 15
 });
 </script>
 <!-- END of JS -->

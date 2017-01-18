@@ -3,7 +3,8 @@
 <script>requirejs.config({
     "paths": {
         "jquery": "js/jquery.min.js"
-    }
+    },
+    "waitSeconds": 15
 });
 </script>
 <!-- END of JS -->
