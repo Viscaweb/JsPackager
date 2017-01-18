@@ -24,17 +24,18 @@ module.exports = {
     module: {
         loaders: [
             // Disable AMD @todo To check.
-            { test: /\.js/, loader: 'imports?define=>false'},
             {
                 test: /bootstrap/,
-                loader: "imports?$=jquery"
+                loader: "imports-loader?$=jquery"
             }
         ]
     },
 
     plugins: [
         new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.CommonsChunkPlugin("commons.js", ['jquery']),
+        new webpack.optimize.CommonsChunkPlugin({
+            "name": "commons.js",
+        }),
         //new webpack.optimize.UglifyJsPlugin()
     ]
 };

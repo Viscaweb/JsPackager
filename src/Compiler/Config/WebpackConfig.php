@@ -28,20 +28,25 @@ class WebpackConfig
     /** @var FileLocator */
     protected $fileLocator;
 
+    /** @var string */
+    protected $temporalPath;
+
     /**
      * WebpackConfig constructor.
      *
      * @param string           $rootDir
      * @param Twig_Environment $twig
-     * @param string           $templatePath  Path to config.js template
+     * @param string           $templatePath Path to config.js template
+     * @param string|null      $temporalPath Path used to generate temporal assets.
      */
-    public function __construct(Twig_Environment $twig, $rootDir, $templatePath)
+    public function __construct(Twig_Environment $twig, $rootDir, $templatePath, $temporalPath = null)
     {
         $this->rootDir = dirname($rootDir);
         $this->twig = $twig;
         // pfff, i don't like this, but i can't find any other
         // way to pass '@' from yml
         $this->templatePath = $templatePath;
+        $this->temporalPath = $temporalPath;
     }
 
     /**
@@ -155,7 +160,9 @@ class WebpackConfig
     public function getTemporalPath()
     {
 //        return $this->rootDir.'/tmp';
-        return sys_get_temp_dir();
+        return $this->temporalPath === null
+            ? sys_get_temp_dir()
+            : $this->temporalPath;
     }
 
     /**

@@ -49,7 +49,8 @@ class WebpackTest extends WebTestCase
         $this->webpackConfig = new WebpackConfig(
             $twig,
             $this->rootPath,
-            $template
+            $template,
+            $this->temporalPath
         );
         $this->compiler = new Webpack(
             $this->webpackConfig
