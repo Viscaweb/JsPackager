@@ -20,6 +20,9 @@ class Webpack extends AbstractCompiler
     /** @var WebpackConfig */
     protected $webpackConfig;
 
+    /** @var string */
+    protected $nodePath;
+
     /** @var PackageStats */
     protected $lastStats;
 
@@ -28,11 +31,13 @@ class Webpack extends AbstractCompiler
      *
      * @param WebpackConfig $webpackConfig
      * @param string        $temporalPath
+     * @param string        $nodePath
      * @param bool          $debug
      */
-    public function __construct(WebpackConfig $webpackConfig, $rootDir, $debug = false)
+    public function __construct(WebpackConfig $webpackConfig, $rootDir, $nodePath, $debug = false)
     {
         $this->webpackConfig = $webpackConfig;
+        $this->nodePath = $nodePath;
         $this->rootDir = dirname(rtrim($rootDir, '/'));
         $this->setDebug($debug);
     }
@@ -87,7 +92,7 @@ class Webpack extends AbstractCompiler
         $path = $this->webpackConfig->getTemporalPath();
         $cmd =
             // Be sure our node_modules folder is available by node
-            'export NODE_PATH=\''.$this->rootDir.'/node_modules/\' && /usr/bin/node '.
+            'export NODE_PATH=\''.$this->rootDir.'/node_modules/\' && '.$this->nodePath.' '.
             $this->rootDir.'/node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
 
         $output = [];
