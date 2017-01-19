@@ -87,7 +87,7 @@ class Webpack extends AbstractCompiler
         $path = $this->webpackConfig->getTemporalPath();
         $cmd =
             // Be sure our node_modules folder is available by node
-            'export NODE_PATH=\''.$this->rootDir.'/node_modules/\' && '.
+            'export NODE_PATH=\''.$this->rootDir.'/node_modules/\' && /usr/bin/node '.
             $this->rootDir.'/node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
 
         $output = [];
@@ -98,8 +98,6 @@ class Webpack extends AbstractCompiler
         $output = implode('', $output);
         $jsonOutput = json_decode($output, true);
         $stats = $this->processStats($jsonOutput, $config);
-
-//        $output = '';
 
         if (!is_array($jsonOutput) || !isset($jsonOutput['assetsByChunkName'])) {
             throw new \RuntimeException(
