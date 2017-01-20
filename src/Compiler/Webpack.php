@@ -2,7 +2,7 @@
 
 namespace Visca\JsPackager\Compiler;
 
-use Visca\JsPackager\Compiler\Config\WebpackConfig;
+use Visca\JsPackager\Compiler\Webpack\WebpackConfig;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Model\EntryPoint;
@@ -60,7 +60,7 @@ class Webpack extends AbstractCompiler
      */
     public function compileCollection(ConfigurationDefinition $config)
     {
-        $this->compileWebpackConfig($config);
+        $this->compileWebpackConfig($config, $this->debug);
 
         return $this->doCompilation($config);
     }
@@ -100,21 +100,13 @@ class Webpack extends AbstractCompiler
         $dd = exec($cmd, $output, $return_var);
 
         // Analyze output
-        $output = implode('', $output);
-        $jsonOutput = json_decode($output, true);
-        $stats = $this->processStats($jsonOutput, $config);
-
-        if (!is_array($jsonOutput) || !isset($jsonOutput['assetsByChunkName'])) {
-            throw new \RuntimeException(
-                'Could not compile JS with webpack.'
-            );
-        }
+        $stats = $this->processStats($output, $config);
 
         $entryPoints = $config->getEntryPoints();
 
         // Check if there is any "commons.js" generated output.
         // Favour loading it as the first asset.
-        $vendorAssets = $this->getVendorAssets($jsonOutput);
+        $vendorAssets = $stats->getVendorAssets();
 
 
         $output = [];
@@ -171,46 +163,15 @@ class Webpack extends AbstractCompiler
     }
 
     /**
-     * @param $stats
-     *
-     * @return array
+     * @param string                  $webpackOutput
+     * @param ConfigurationDefinition $config
      */
-    protected function getVendorAssets($stats)
+    private function processStats($webpackOutput, ConfigurationDefinition $config)
     {
-        if (!isset($stats['assetsByChunkName'])) {
-            return [];
-        }
+        // Try to convert output to JSON
+        $webpackOutput = implode('', $webpackOutput);
+        $jsonStats = json_decode($webpackOutput, true);
 
-        $keys = array_keys($stats['assetsByChunkName']);
-        $vendorKeys = array_filter(
-            $keys,
-            function ($item) {
-                //vendor;
-                return (substr($item, 0, 6) === 'vendor');
-            }
-        );
-
-        $vendorAssets = [];
-        foreach ($vendorKeys as $key) {
-            $asset = $stats['assetsByChunkName'][$key];
-            if (is_array($asset)) {
-                // We may have generated source-maps, webpack groups them by filename.
-                $asset = $asset[0];
-            }
-
-            $vendorAssets[$key] = $asset;
-        }
-
-        ksort($vendorAssets);
-
-        return $vendorAssets;
-    }
-
-    /**
-     *
-     */
-    private function processStats($jsonStats, ConfigurationDefinition $config)
-    {
         $assetsBuilt = [];
         if (isset($jsonStats['assetsByChunkName'])) {
             foreach ($jsonStats['assetsByChunkName'] as $name => $asset) {
@@ -227,6 +188,28 @@ class Webpack extends AbstractCompiler
             }
         }
 
+        $vendorAssets = [];
+        $keys = array_keys($jsonStats['assetsByChunkName']);
+        $vendorKeys = array_filter(
+            $keys,
+            function ($item) {
+                //vendor;
+                return (substr($item, 0, 6) === 'vendor');
+            }
+        );
+
+        $vendorAssets = [];
+        foreach ($vendorKeys as $key) {
+            $asset = $jsonStats['assetsByChunkName'][$key];
+            if (is_array($asset)) {
+                // We may have generated source-maps, webpack groups them by filename.
+                $asset = $asset[0];
+            }
+
+            $vendorAssets[$key] = $asset;
+        }
+        ksort($vendorAssets);
+
         $errors = [];
         if (isset($jsonStats['errors']) && count($jsonStats['errors'])) {
             $errors[] = $jsonStats['errors'][0];
@@ -234,6 +217,7 @@ class Webpack extends AbstractCompiler
 
         $this->lastStats = new PackageStats(
             $assetsBuilt,
+            $vendorAssets,
             $errors
         );
 

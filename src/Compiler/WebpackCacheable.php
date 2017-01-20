@@ -61,7 +61,6 @@ class WebpackCacheable implements CompilerInterface
             $cacheKey = $this->getCacheKey([$entryPoint]);
 
             $html = isset($output[$key]) ? $output[$key] : '<!-- NOT FOUND -->';
-
             $result = $this->cache->save($cacheKey, $html);
         }
 

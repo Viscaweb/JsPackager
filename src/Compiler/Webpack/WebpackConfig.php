@@ -1,9 +1,13 @@
 <?php
 
-namespace Visca\JsPackager\Compiler\Config;
+namespace Visca\JsPackager\Compiler\Webpack;
 
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Twig_Environment;
+use Visca\JsPackager\Compiler\Webpack\Plugins\BundleAnalyzerPlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\CommonsChunkPlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\MinChunkSizePlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\UglifyJsPlugin;
 use Visca\JsPackager\Model\AliasResource;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Model\Shim;
@@ -50,11 +54,12 @@ class WebpackConfig
     }
 
     /**
-     * @param ConfigurationDefinition $config
+     * @param ConfigurationDefinition $config Configuration file.
+     * @param                         bool    Enables some debugging info in the output.
      *
      * @return string
      */
-    public function compile(ConfigurationDefinition $config)
+    public function compile(ConfigurationDefinition $config, $debug = false)
     {
         // Module Alias
         // ------------
@@ -67,17 +72,17 @@ class WebpackConfig
                 $path = ltrim($resource->getPath(), '/');
                 $shims = $alias->getShims();
                 /* @TODO does not work totally... better put this in webpack.config.js instead.
-                if (count($shims) > 0) {
-                    $shimCollection = [];
-                    foreach ($shims as $shim) {
-                        if ($shim instanceof Shim) {
-                            $shimCollection[] = $shim->getGlobalVariable().'='.$shim->getModuleName();
-                        }
-                    }
-                    $path = self::IMPORTS_LOADER.'?'.implode('&', $shimCollection).'!'.$publicPath.$path;
-                } else {
-                */
-                    $path = $publicPath.'/'.$path;
+                 * if (count($shims) > 0) {
+                 * $shimCollection = [];
+                 * foreach ($shims as $shim) {
+                 * if ($shim instanceof Shim) {
+                 * $shimCollection[] = $shim->getGlobalVariable().'='.$shim->getModuleName();
+                 * }
+                 * }
+                 * $path = self::IMPORTS_LOADER.'?'.implode('&', $shimCollection).'!'.$publicPath.$path;
+                 * } else {
+                 */
+                $path = $publicPath.'/'.$path;
 //                }
 
                 $wpAlias[$alias->getName()] = $path;
@@ -91,7 +96,7 @@ class WebpackConfig
         if (count($globalInlineEntryPoint) > 0) {
             $entryPointGlobalToInline = '';
             foreach ($globalInlineEntryPoint as $entryPoint) {
-                $entryPointGlobalToInline.= $entryPoint->getResource()->getContent();
+                $entryPointGlobalToInline .= $entryPoint->getResource()->getContent();
             }
         }
 
@@ -111,9 +116,9 @@ class WebpackConfig
 
             $content = '';
             if (!empty($entryPointGlobalToInline)) {
-                $content.= $entryPointGlobalToInline;
+                $content .= $entryPointGlobalToInline;
             }
-            $content.= $resource->getContent();
+            $content .= $resource->getContent();
 
             $path = $this->saveTemporalEntryPoint($ep->getName(), $content);
 
@@ -123,14 +128,40 @@ class WebpackConfig
             ];
         }
 
+        // -----------------
+        // Plugins
+        // -----------------
+        $plugins = [];
+        $plugins[] = new CommonsChunkPlugin();
+        $plugins[] = new UglifyJsPlugin();
+        $plugins[] = new MinChunkSizePlugin();
+
+        if ($debug) {
+            $plugins[] = new BundleAnalyzerPlugin();
+        }
+
+
+        // -----------------------
+        // require() calls to make
+        // -----------------------
+        $jsModules = [];
+        foreach ($plugins as $plugin) {
+            $moduleName = $plugin->getModuleName();
+            if ($moduleName !== null && !isset($jsModules[$moduleName])) {
+                $jsModules[$moduleName] = $plugin->getRequireCall();
+            }
+        }
+
 
         $output = $this->twig->render(
             $this->templatePath,
             [
+                'jsModules' => $jsModules,
                 'entryPoints' => $entryPoints,
                 'outputPath' => $config->getBuildOutputPath(),
                 'publicPath' => $config->getOutputPublicPath(),
                 'alias' => $wpAlias,
+                'plugins' => $plugins
             ]
         );
 
@@ -159,6 +190,8 @@ class WebpackConfig
 
     public function getTemporalPath()
     {
+        return $this->rootDir.'/tmp';
+
         if ($this->temporalPath !== null) {
             if (!is_dir($this->temporalPath)) {
                 mkdir($this->temporalPath, 0777, true);
@@ -176,11 +209,12 @@ class WebpackConfig
      *
      * @return string
      */
-    private function getRelativePath($base, $path) {
+    private function getRelativePath($base, $path)
+    {
         // Detect directory separator
         $separator = substr($base, 0, 1);
-        $base = array_slice(explode($separator, rtrim($base,$separator)),1);
-        $path = array_slice(explode($separator, rtrim($path,$separator)),1);
+        $base = array_slice(explode($separator, rtrim($base, $separator)), 1);
+        $path = array_slice(explode($separator, rtrim($path, $separator)), 1);
 
         return $separator.implode($separator, array_slice($path, count($base)));
     }
