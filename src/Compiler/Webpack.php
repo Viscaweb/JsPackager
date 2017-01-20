@@ -70,9 +70,9 @@ class Webpack extends AbstractCompiler
      *
      * @param ConfigurationDefinition $config
      */
-    protected function compileWebpackConfig(ConfigurationDefinition $config)
+    protected function compileWebpackConfig(ConfigurationDefinition $config, $debug = false)
     {
-        $webpackConfigPath = $this->webpackConfig->compile($config);
+        $webpackConfigPath = $this->webpackConfig->compile($config, $debug);
     }
 
     /**
