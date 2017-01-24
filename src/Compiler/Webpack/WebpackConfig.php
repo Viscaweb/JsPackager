@@ -132,7 +132,7 @@ class WebpackConfig
         // Plugins
         // -----------------
         $plugins = [];
-        $plugins[] = new CommonsChunkPlugin();
+        $plugins[] = new CommonsChunkPlugin($config);
         $plugins[] = new UglifyJsPlugin();
         $plugins[] = new MinChunkSizePlugin();
 
