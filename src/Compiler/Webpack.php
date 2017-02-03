@@ -93,7 +93,7 @@ class Webpack extends AbstractCompiler
         $cmd =
             // Be sure our node_modules folder is available by node
             'export NODE_PATH=\''.$this->rootDir.'/node_modules/\' && '.$this->nodePath.' '.
-            $this->rootDir.'/node_modules/.bin/webpack --json --config '.$path.'/webpack.config.js';
+            $this->rootDir.'/node_modules/.bin/webpack --json --config '.$path.'/webpack.config.'.$config->getName().'.js';
 
         $output = [];
         $return_var = [];

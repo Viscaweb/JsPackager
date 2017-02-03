@@ -50,6 +50,14 @@ class WebpackConfig
         // pfff, i don't like this, but i can't find any other
         // way to pass '@' from yml
         $this->templatePath = $templatePath;
+
+        if ($temporalPath !== null) {
+            if (!is_dir($temporalPath)) {
+                mkdir($temporalPath, 0777, true);
+            }
+
+            $temporalPath = realpath($temporalPath);
+        }
         $this->temporalPath = $temporalPath;
     }
 
@@ -165,7 +173,7 @@ class WebpackConfig
             ]
         );
 
-        $path = $this->getTemporalPath().'/webpack.config.js';
+        $path = $this->getTemporalPath().'/webpack.config.'.$config->getName().'.js';
 
         file_put_contents($path, $output);
 
@@ -190,12 +198,6 @@ class WebpackConfig
 
     public function getTemporalPath()
     {
-        if ($this->temporalPath !== null) {
-            if (!is_dir($this->temporalPath)) {
-                mkdir($this->temporalPath, 0777, true);
-            }
-        }
-
         return $this->temporalPath === null
             ? sys_get_temp_dir()
             : $this->temporalPath;

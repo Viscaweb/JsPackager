@@ -11,6 +11,9 @@ use Visca\JsPackager\Model\Alias;
 class ConfigurationDefinition
 {
     /** @var string */
+    private $name;
+
+    /** @var string */
     private $currentEnvironment;
 
     /**
@@ -43,11 +46,21 @@ class ConfigurationDefinition
     /**
      * ConfigurationDefinition constructor.
      *
+     * @param string $name
      * @param string $environment
      */
-    public function __construct($environment)
+    public function __construct($name, $environment)
     {
+        $this->name = $name;
         $this->currentEnvironment = $environment;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
