@@ -6,6 +6,7 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 use Twig_Environment;
 use Visca\JsPackager\Compiler\Webpack\Plugins\BundleAnalyzerPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\CommonsChunkPlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\DuplicatePackageCheckerPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\MinChunkSizePlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\UglifyJsPlugin;
 use Visca\JsPackager\Model\AliasResource;
@@ -143,6 +144,7 @@ class WebpackConfig
         $plugins[] = new CommonsChunkPlugin($config);
         $plugins[] = new UglifyJsPlugin();
         $plugins[] = new MinChunkSizePlugin();
+        $plugins[] = new DuplicatePackageCheckerPlugin();
 
         if ($debug) {
             $plugins[] = new BundleAnalyzerPlugin();

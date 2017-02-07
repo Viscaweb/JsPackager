@@ -170,7 +170,20 @@ class Webpack extends AbstractCompiler
     {
         // Try to convert output to JSON
         $webpackOutput = implode('', $webpackOutput);
+        $pos = strpos($webpackOutput, '{');
+        if ($pos > 0) {
+            $webpackOutput = substr($webpackOutput, $pos);
+        }
+
+        $pos = strrpos($webpackOutput, '}');
+        if ($pos != (strlen($webpackOutput) - 1)) {
+            $webpackOutput = substr($webpackOutput, 0, $pos+1);
+        }
+
         $jsonStats = json_decode($webpackOutput, true);
+        if ($jsonStats === false) {
+            throw new \RuntimeException('Could not json_decode on webpack output.');
+        }
 
         $assetsBuilt = [];
         if (isset($jsonStats['assetsByChunkName'])) {
