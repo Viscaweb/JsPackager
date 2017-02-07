@@ -165,6 +165,8 @@ class Webpack extends AbstractCompiler
     /**
      * @param string                  $webpackOutput
      * @param ConfigurationDefinition $config
+     *
+     * @throws \RuntimeException
      */
     private function processStats($webpackOutput, ConfigurationDefinition $config)
     {
