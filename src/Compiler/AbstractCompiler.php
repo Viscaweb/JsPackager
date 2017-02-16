@@ -22,7 +22,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param UrlProcessor $urlProcessor
      * @param bool         $debug
      */
-    public function __construct(UrlProcessor $urlProcessor, $debug = false)
+    public function __construct(UrlProcessor $urlProcessor = null, $debug = false)
     {
         $this->urlProcessor = $urlProcessor;
         $this->debug = $debug;

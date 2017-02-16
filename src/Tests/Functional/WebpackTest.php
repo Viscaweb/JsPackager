@@ -2,7 +2,9 @@
 
 namespace Visca\JsPackager\Tests\Functional;
 
+use Doctrine\Common\Cache\VoidCache;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Visca\JsPackager\Compiler\Url\UrlProcessor;
 use Visca\JsPackager\Compiler\Webpack;
 use Visca\JsPackager\Compiler\Webpack\WebpackConfig;
 use Visca\JsPackager\Model\EntryPoint;
@@ -52,9 +54,11 @@ class WebpackTest extends WebTestCase
             $template,
             $this->temporalPath
         );
-        
+
         $this->compiler = new Webpack(
-            $this->webpackConfig
+            $this->webpackConfig,
+            $this->getContainer()->getParameter('kernel.root_dir'),
+            $this->getContainer()->getParameter('jspackager_node_path')
         );
 
         $this->config = new ConfigurationDefinition('desktop', 'prod');
