@@ -30,16 +30,18 @@ class Webpack extends AbstractCompiler
      * Webpack constructor.
      *
      * @param WebpackConfig $webpackConfig
-     * @param string        $temporalPath
+     * @param bool          $rootDir
      * @param string        $nodePath
      * @param bool          $debug
+     * @param UrlProcessor  $urlProcessor
      */
-    public function __construct(WebpackConfig $webpackConfig, $rootDir, $nodePath, $debug = false)
+    public function __construct(WebpackConfig $webpackConfig, $rootDir, $nodePath, $debug = false, UrlProcessor $urlProcessor = null)
     {
         $this->webpackConfig = $webpackConfig;
         $this->nodePath = $nodePath;
         $this->rootDir = dirname(rtrim($rootDir, '/'));
-        $this->setDebug($debug);
+
+        parent::__construct($urlProcessor, $debug);
     }
 
     /**
@@ -48,6 +50,14 @@ class Webpack extends AbstractCompiler
     public function getName()
     {
         return 'webpack';
+    }
+
+    /**
+     * @return PackageStats
+     */
+    public function getStats()
+    {
+        return $this->lastStats;
     }
 
     public function compile(EntryPoint $entryPoint, ConfigurationDefinition $config)
@@ -88,7 +98,6 @@ class Webpack extends AbstractCompiler
         // Clear output path
         $this->clearOutputPath($config);
 
-
         $path = $this->webpackConfig->getTemporalPath();
         $cmd =
             // Be sure our node_modules folder is available by node
@@ -118,7 +127,7 @@ class Webpack extends AbstractCompiler
             $externalAssets = $entryPoint->getExternalResources();
             if (count($externalAssets) > 0) {
                 foreach ($externalAssets as $script) {
-                    $output[$key] .= $this->addScriptTag($script->getUrl());
+                    $output[$key] .= $this->addScriptTag($script->getUrl(), $config);
                 }
             }
 
@@ -252,13 +261,5 @@ class Webpack extends AbstractCompiler
                 unlink($file);
             } // delete file
         }
-    }
-
-    /**
-     *
-     */
-    public function getStats()
-    {
-        return $this->lastStats;
     }
 }
