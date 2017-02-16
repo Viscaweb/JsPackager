@@ -3,8 +3,8 @@
 namespace Visca\JsPackager\Tests\Functional;
 
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Visca\JsPackager\Compiler\Config\WebpackConfig;
 use Visca\JsPackager\Compiler\Webpack;
+use Visca\JsPackager\Compiler\Webpack\WebpackConfig;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Model\StringResource;
@@ -52,11 +52,12 @@ class WebpackTest extends WebTestCase
             $template,
             $this->temporalPath
         );
+        
         $this->compiler = new Webpack(
             $this->webpackConfig
         );
 
-        $this->config = new ConfigurationDefinition('desktop');
+        $this->config = new ConfigurationDefinition('desktop', 'prod');
         $this->config->setBuildOutputPath($this->temporalPath.'/build');
         $this->config->setOutputPublicPath('/js/min/');
     }

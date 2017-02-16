@@ -38,7 +38,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
      */
     public function testEmptyConfig()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
 
         $entryPoint = new EntryPoint('xxx', new StringResource(''));
 
@@ -51,7 +51,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
 
     public function testBaseUrl()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
         $config->setOutputPublicPath('/web/');
 
         $entryPoint = new EntryPoint('xxx', new StringResource(''));
@@ -67,7 +67,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
      */
     public function testAlias()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
 
         $resource = new FileResource('js/jquery.min.js');
 
@@ -87,7 +87,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
      */
     public function testShim()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
 
         $resource = new FileResource('js/bootstrap.min.js');
         $shim = new Shim();
@@ -116,7 +116,7 @@ class RequireJsTest extends PHPUnit_Framework_TestCase
         $resource = new StringResource('console.log(\'hello\');');
         $entryPoint = new EntryPoint($pageName, $resource);
 
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
         $config->addEntryPoint($entryPoint);
 
         $entryPoint = new EntryPoint('xxx', new StringResource(''));
