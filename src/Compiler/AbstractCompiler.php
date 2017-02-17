@@ -56,7 +56,7 @@ abstract class AbstractCompiler implements CompilerInterface
      */
     protected function addScriptTag($url, ConfigurationDefinition $config = null)
     {
-        if(!is_null($config)){
+        if(!is_null($config) && !is_null($this->urlProcessor)){
             $url = $this->urlProcessor->processUrl($url, $config);
         }
 

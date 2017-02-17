@@ -71,6 +71,7 @@ class WebpackTest extends WebTestCase
      */
     public function testEmptyConfig()
     {
+        $this->markTestSkipped('Webpack does not allow no entry points anymore.');
         $output = $this->compiler->compileCollection($this->config);
 
         $this->assertCount(0, $output);
