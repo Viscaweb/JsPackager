@@ -9,6 +9,7 @@ use Visca\JsPackager\Compiler\Webpack\Plugins\CommonsChunkPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\DuplicatePackageCheckerPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\MinChunkSizePlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\UglifyJsPlugin;
+use Visca\JsPackager\Compiler\Webpack\Loaders\JsonLoader;
 use Visca\JsPackager\Model\AliasResource;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Model\Shim;
@@ -142,7 +143,7 @@ class WebpackConfig
         // -----------------
         $plugins = [];
         $plugins[] = new CommonsChunkPlugin($config);
-        $plugins[] = new UglifyJsPlugin();
+//        $plugins[] = new UglifyJsPlugin();
         $plugins[] = new MinChunkSizePlugin();
         $plugins[] = new DuplicatePackageCheckerPlugin();
 
@@ -150,6 +151,11 @@ class WebpackConfig
             $plugins[] = new BundleAnalyzerPlugin();
         }
 
+        // -----------------------
+        // Loaders
+        // -----------------------
+        $loaders = [];
+        $loaders[] = new JsonLoader();
 
         // -----------------------
         // require() calls to make
@@ -171,6 +177,7 @@ class WebpackConfig
                 'outputPath' => $config->getBuildOutputPath(),
                 'publicPath' => $config->getOutputPublicPath(),
                 'alias' => $wpAlias,
+                'loaders' => $loaders,
                 'plugins' => $plugins
             ]
         );
