@@ -83,7 +83,6 @@ class WebpackConfig
                 $resource = $alias->getResource();
                 $path = ltrim($resource->getPath(), '/');
                 $shims = $alias->getShims();
-                // @TODO does not work totally... better put this in webpack.config.js instead.
 
                 if (count($shims) > 0) {
                     foreach ($shims as $shim) {
@@ -156,7 +155,6 @@ class WebpackConfig
         if (count($shimmingModules) > 0) {
             $plugins[] = new ProvidePlugin($shimmingModules);
         }
-
 
         // -----------------------
         // Loaders
