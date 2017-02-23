@@ -8,6 +8,7 @@ use Visca\JsPackager\Compiler\Webpack\Plugins\BundleAnalyzerPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\CommonsChunkPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\DuplicatePackageCheckerPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\MinChunkSizePlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\ProvidePlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\UglifyJsPlugin;
 use Visca\JsPackager\Compiler\Webpack\Loaders\JsonLoader;
 use Visca\JsPackager\Model\AliasResource;
@@ -76,24 +77,23 @@ class WebpackConfig
         $aliases = $config->getAlias();
         $wpAlias = [];
         $publicPath = rtrim($this->rootDir.'/web', '/');
+        $shimmingModules = [];
         if (count($aliases) > 0) {
             foreach ($aliases as $alias) {
                 $resource = $alias->getResource();
                 $path = ltrim($resource->getPath(), '/');
                 $shims = $alias->getShims();
-                /* @TODO does not work totally... better put this in webpack.config.js instead.
-                 * if (count($shims) > 0) {
-                 * $shimCollection = [];
-                 * foreach ($shims as $shim) {
-                 * if ($shim instanceof Shim) {
-                 * $shimCollection[] = $shim->getGlobalVariable().'='.$shim->getModuleName();
-                 * }
-                 * }
-                 * $path = self::IMPORTS_LOADER.'?'.implode('&', $shimCollection).'!'.$publicPath.$path;
-                 * } else {
-                 */
+                // @TODO does not work totally... better put this in webpack.config.js instead.
+
+                if (count($shims) > 0) {
+                    foreach ($shims as $shim) {
+                        if ($shim instanceof Shim) {
+                            $shimmingModules[] = $shim;
+                        }
+                    }
+                }
+
                 $path = $publicPath.'/'.$path;
-//                }
 
                 $wpAlias[$alias->getName()] = $path;
             }
@@ -152,6 +152,11 @@ class WebpackConfig
         if ($debug) {
             $plugins[] = new BundleAnalyzerPlugin();
         }
+
+        if (count($shimmingModules) > 0) {
+            $plugins[] = new ProvidePlugin($shimmingModules);
+        }
+
 
         // -----------------------
         // Loaders
