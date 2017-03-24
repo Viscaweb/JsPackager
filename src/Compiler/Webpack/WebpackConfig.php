@@ -7,6 +7,7 @@ use Twig_Environment;
 use Visca\JsPackager\Compiler\Webpack\Plugins\BundleAnalyzerPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\CommonsChunkPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\DuplicatePackageCheckerPlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\GenericPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\MinChunkSizePlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\ProvidePlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\UglifyJsPlugin;
@@ -147,15 +148,18 @@ class WebpackConfig
         }
         $plugins[] = new MinChunkSizePlugin();
         $plugins[] = new DuplicatePackageCheckerPlugin();
+        $plugins[] = new GenericPlugin('webpack2PolyfillPlugin', 'webpack2-polyfill-plugin');
 
         if ($debug) {
             $plugins[] = new BundleAnalyzerPlugin();
         }
 
+        $shimmingModules[] = new Shim('Promise', 'es6-promise');
+
         if (count($shimmingModules) > 0) {
             $plugins[] = new ProvidePlugin($shimmingModules);
         }
-
+        
         // -----------------------
         // Loaders
         // -----------------------
