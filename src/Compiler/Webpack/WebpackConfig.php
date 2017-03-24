@@ -159,7 +159,7 @@ class WebpackConfig
         if (count($shimmingModules) > 0) {
             $plugins[] = new ProvidePlugin($shimmingModules);
         }
-        
+
         // -----------------------
         // Loaders
         // -----------------------
