@@ -15,6 +15,7 @@ class WebpackCompilerTest extends \PHPUnit_Framework_TestCase
 
     public function test(){
         $this->markTestIncomplete('to be completed');
+
         $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__.'/../../Resources')));
         $webpackTemplate = 'webpack.config.yml.dist';
         $rootDir = realpath(__DIR__.'/../../');
