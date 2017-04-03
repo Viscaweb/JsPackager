@@ -134,7 +134,7 @@ class WebpackConfigTest extends \PHPUnit_Framework_TestCase
         $path = __DIR__;
 
         $this->resourcesPath = realpath($path.'/../../Resources');
-        $this->rootPath = realpath($path.'/../../Resources/tmp');
+        $this->rootPath = sys_get_temp_dir();
         $this->twig = new \Twig_Environment(new \Twig_Loader_Filesystem($this->resourcesPath));
 
         $this->webpackConfig = new WebpackConfig(
