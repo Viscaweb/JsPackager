@@ -27,10 +27,14 @@ class WebpackTest extends \PHPUnit_Framework_TestCase
     }
 
     private function createStorage($jsToReturn = null){
-        $storage = $this->getMockBuilder(CompiledFileStorage::class)->getMock();
+        $storage = $this
+            ->getMockBuilder(CompiledFileStorage::class)
+            ->setMethods(['contains', 'fetch'])
+            ->getMock();
 
         if ($jsToReturn === null){
             $storage->method('contains')->willReturn(false);
+            $storage->method('fetch')->willReturn(false);
         } else {
             $storage->method('contains')->willReturn(true);
             $storage->method('fetch')->willReturn($jsToReturn);

@@ -16,6 +16,7 @@ use Visca\JsPackager\Model\AliasResource;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Model\Shim;
 use Visca\JsPackager\ConfigurationDefinition;
+use Visca\JsPackager\Utils\FileSystem;
 
 /**
  * Class WebpackConfig
@@ -49,6 +50,8 @@ class WebpackConfig
      */
     public function __construct(Twig_Environment $twig, $rootDir, $templatePath, $temporalPath = null)
     {
+        FileSystem::ensureDirExists($rootDir);
+
         $this->rootDir = dirname($rootDir);
         $this->twig = $twig;
         // pfff, i don't like this, but i can't find any other

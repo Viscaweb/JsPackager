@@ -98,7 +98,18 @@ class WebpackConfigTest extends \PHPUnit_Framework_TestCase
         $compiledJsFile = $this->webpackConfig->compile($config);
         $compiledJs = file_get_contents($compiledJsFile);
 
-        $this->assertEquals($expectedJs, $compiledJs);
+        $this->assertEquals($this->formatJs($expectedJs), $this->formatJs($compiledJs));
+    }
+
+    /**
+     * @param string $jsContent
+     *
+     * @return string
+     */
+    private function formatJs($jsContent){
+        $jsContent = str_replace("\n", "", $jsContent);
+
+        return $jsContent;
     }
 
     /** @var \Twig_Environment */
