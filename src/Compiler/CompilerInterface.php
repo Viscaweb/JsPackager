@@ -1,13 +1,10 @@
 <?php
 namespace Visca\JsPackager\Compiler;
 
+use Visca\JsPackager\Compiler\Storage\Exceptions\UnableToProvideScriptException;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Model\EntryPoint;
 
-/**
- * Interface CompilerInterface
- * @package Visca\JS\Manager
- */
 interface CompilerInterface
 {
     /**
@@ -18,22 +15,10 @@ interface CompilerInterface
     /**
      * @param EntryPoint              $entryPoint
      * @param ConfigurationDefinition $config
-     * @param string|null             $requiredPageName The page's javascript we want.
      *
      * @return string
+     * @throws UnableToProvideScriptException
      */
     public function compile(EntryPoint $entryPoint, ConfigurationDefinition $config);
 
-    /**
-     * @param EntryPoint[]            $entryPoints
-     * @param ConfigurationDefinition $config
-     *
-     * @return array
-     */
-    public function compileCollection(ConfigurationDefinition $config);
-
-    /**
-     * @return PackageStats
-     */
-    public function getStats();
 }

@@ -6,6 +6,8 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
+    "doctrine/cache": "^1.6",
+    "twig/twig": "^1.33"
   },
   "autoload": {
     "psr-4": {

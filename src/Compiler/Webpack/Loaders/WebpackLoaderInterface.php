@@ -13,7 +13,7 @@ interface WebpackLoaderInterface
     /**
      * Return the regex expression that enables this loader.
      *
-     * @return return
+     * @return string
      */
     public function getTest();
 }

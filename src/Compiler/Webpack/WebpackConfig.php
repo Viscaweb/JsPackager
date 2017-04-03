@@ -55,7 +55,7 @@ class WebpackConfig
         // way to pass '@' from yml
         $this->templatePath = $templatePath;
 
-        if ($temporalPath !== null) {
+        if ($temporalPath) {
             if (!is_dir($temporalPath)) {
                 mkdir($temporalPath, 0777, true);
             }
