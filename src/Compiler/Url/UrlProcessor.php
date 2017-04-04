@@ -25,8 +25,8 @@ class UrlProcessor
     /**
      * UrlProcessor constructor.
      *
-     * @param MemcachedCache $cacheStorage
-     * @param string         $rootPath
+     * @param Cache  $cacheStorage
+     * @param string $rootPath
      */
     public function __construct(Cache $cacheStorage, $rootPath)
     {

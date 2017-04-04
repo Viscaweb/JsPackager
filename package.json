@@ -1,0 +1,8 @@
+{
+    "name": "life-js-packager",
+    "dependencies": {
+        "webpack": "^2.3.1",
+        "webpack2-polyfill-plugin": "0.0.2"
+    },
+    "license": "UNLICENSED"
+}

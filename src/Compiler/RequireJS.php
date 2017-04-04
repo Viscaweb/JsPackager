@@ -9,25 +9,27 @@ use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
 
-/**
- * Class RequireJSManager
- */
-class RequireJS extends AbstractCompiler
+class RequireJS implements CompilerInterface
 {
+    /** @var UrlProcessor */
+    protected $urlProcessor;
+
+    /**
+     * RequireJS constructor.
+     *
+     * @param UrlProcessor $urlProcessor
+     */
+    public function __construct(UrlProcessor $urlProcessor)
+    {
+        $this->urlProcessor = $urlProcessor;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
         return 'requirejs';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStats()
-    {
-        return new PackageStats([]);
     }
 
     /**
@@ -87,14 +89,6 @@ class RequireJS extends AbstractCompiler
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function compileCollection(ConfigurationDefinition $config)
-    {
-        throw new \RuntimeException('RequireJS packager does not support processing multiple entrypoints at once.');
-    }
-
-    /**
      * @param ConfigurationDefinition $config
      *
      * @return string
@@ -143,5 +137,22 @@ class RequireJS extends AbstractCompiler
             ).');';
 
         return $script;
+    }
+
+    /**
+     * @param string                       $url
+     * @param ConfigurationDefinition|null $config
+     *
+     * @return string
+     */
+    private function addScriptTag($url, ConfigurationDefinition $config = null)
+    {
+        if(!is_null($config) && !is_null($this->urlProcessor)){
+            $url = $this->urlProcessor->processUrl($url, $config);
+        }
+
+        $tag = '<script src="'.$url.'"></script>';
+
+        return $tag;
     }
 }

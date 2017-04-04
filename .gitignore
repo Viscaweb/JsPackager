@@ -1,2 +1,10 @@
+# Temp folders
 src/Resources/temp
 src/Resources/tmp
+
+# Managed by Composer/Node
+/vendor/
+/node_modules/
+
+# IDE
+.idea

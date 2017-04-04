@@ -18,8 +18,7 @@ module.exports = {
 
     resolve: {
         alias: {
-    "jquery": "%rootPath%/web/js/vendor/jquery.min.js",
-    "bootstrap": "%rootPath%/web/js/vendor/bootstrap.min.js"
+    "jquery": "%rootPath%/js/vendor/jquery.min.js"
 }
     },
 
