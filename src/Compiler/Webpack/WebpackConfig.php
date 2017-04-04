@@ -26,7 +26,7 @@ class WebpackConfig
     const IMPORTS_LOADER = 'imports-loader';
 
     /** @var string */
-    protected $rootDir;
+    protected $publicDir;
 
     /** @var Twig_Environment */
     protected $twig;
@@ -48,11 +48,9 @@ class WebpackConfig
      * @param string           $templatePath Path to config.js template
      * @param string|null      $temporalPath Path used to generate temporal assets.
      */
-    public function __construct(Twig_Environment $twig, $rootDir, $templatePath, $temporalPath = null)
+    public function __construct(Twig_Environment $twig, $publicDir, $templatePath, $temporalPath = null)
     {
-        FileSystem::ensureDirExists($rootDir);
-
-        $this->rootDir = dirname($rootDir);
+        $this->publicDir = $publicDir;
         $this->twig = $twig;
         // pfff, i don't like this, but i can't find any other
         // way to pass '@' from yml
@@ -80,7 +78,7 @@ class WebpackConfig
         // ------------
         $aliases = $config->getAlias();
         $wpAlias = [];
-        $publicPath = rtrim($this->rootDir.'/web', '/');
+        $publicPath = rtrim($this->publicDir, '/');
         $shimmingModules = [];
         if (count($aliases) > 0) {
             foreach ($aliases as $alias) {

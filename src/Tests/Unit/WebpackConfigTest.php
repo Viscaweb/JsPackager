@@ -92,7 +92,7 @@ class WebpackConfigTest extends \PHPUnit_Framework_TestCase
         ConfigurationDefinition $config
     ) {
         $expectedJs = file_get_contents(__DIR__ . '/' . $expectedJsFile);
-        $expectedJs = str_replace('%rootPath%', $this->resourcesPath, $expectedJs);
+        $expectedJs = str_replace('%rootPath%', $this->rootPath, $expectedJs);
         $expectedJs = str_replace('%outputPath%', $this->webpackConfig->getTemporalPath(), $expectedJs);
 
         $compiledJsFile = $this->webpackConfig->compile($config);
@@ -134,14 +134,10 @@ class WebpackConfigTest extends \PHPUnit_Framework_TestCase
         $path = __DIR__;
 
         $this->resourcesPath = realpath($path.'/../../Resources');
-        $this->rootPath = sys_get_temp_dir();
+        $this->rootPath = realpath($path.'/../..');
         $this->twig = new \Twig_Environment(new \Twig_Loader_Filesystem($this->resourcesPath));
 
-        $this->webpackConfig = new WebpackConfig(
-            $this->twig,
-            $this->rootPath,
-            'webpack.config.yml.dist'
-        );
+        $this->webpackConfig = new WebpackConfig($this->twig, $this->rootPath, 'webpack.config.yml.dist');
         $this->config = new ConfigurationDefinition('desktop', 'prod');
     }
 }

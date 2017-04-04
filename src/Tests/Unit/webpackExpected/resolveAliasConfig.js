@@ -18,7 +18,7 @@ module.exports = {
 
     resolve: {
         alias: {
-    "jquery": "%rootPath%/web/js/vendor/jquery.min.js"
+    "jquery": "%rootPath%/js/vendor/jquery.min.js"
 }
     },
 
