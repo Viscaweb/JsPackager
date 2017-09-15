@@ -18,6 +18,18 @@ class Shim
     protected $moduleName;
 
     /**
+     * Shim constructor.
+     *
+     * @param string $globalVariable
+     * @param string $moduleName
+     */
+    public function __construct($globalVariable, $moduleName)
+    {
+        $this->globalVariable = $globalVariable;
+        $this->moduleName = $moduleName;
+    }
+
+    /**
      * @return string
      */
     public function getGlobalVariable()
@@ -26,34 +38,10 @@ class Shim
     }
 
     /**
-     * @param string $globalVariable
-     *
-     * @return $this
-     */
-    public function setGlobalVariable($globalVariable)
-    {
-        $this->globalVariable = $globalVariable;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getModuleName()
     {
         return $this->moduleName;
-    }
-
-    /**
-     * @param string $moduleName
-     *
-     * @return $this
-     */
-    public function setModuleName($moduleName)
-    {
-        $this->moduleName = $moduleName;
-
-        return $this;
     }
 }

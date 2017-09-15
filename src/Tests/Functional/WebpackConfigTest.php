@@ -4,7 +4,7 @@ namespace Visca\JsPackager\Tests\Functional;
 
 //use Assetic\Factory\Resource\FileResource;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Visca\JsPackager\Compiler\Config\WebpackConfig;
+use Visca\JsPackager\Compiler\Webpack\WebpackConfig;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Configuration\ResourceJs;
 use Visca\JsPackager\Model\Shim;
@@ -52,7 +52,7 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testEmptyConfig()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
 
         $outputPath = $this->webpackConfig->compile($config);
         $output = file_get_contents($outputPath);
@@ -66,7 +66,7 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testOutputPath()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
         $config->setOutputPublicPath('js');
 
         $outputPath = $this->webpackConfig->compile($config);
@@ -81,7 +81,7 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testResolveAlias()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
 
         $jquery = new Alias('jquery', new FileResource('js/vendor/jquery.min.js'));
 
@@ -106,7 +106,7 @@ class WebpackConfigTest extends WebTestCase
      */
     public function testResolveAliasWithShim()
     {
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
 
         $resource = new FileResource('js/vendor/jquery.min.js');
         $jquery = new Alias('jquery', $resource);
@@ -139,7 +139,7 @@ class WebpackConfigTest extends WebTestCase
     public function testEntryPointFromUrlConfig()
     {
         $entryPoint = new EntryPoint('matchPage', new FileResource($this->resourcesPath.'/fixtures/match.page.js'));
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
         $config->addEntryPoint($entryPoint);
 
         $outputPath = $this->webpackConfig->compile($config);
@@ -159,7 +159,7 @@ class WebpackConfigTest extends WebTestCase
     {
         $entryPoint = new EntryPoint('matchPage', new StringResource('console.log(\'hello\');'));
 
-        $config = new ConfigurationDefinition('desktop');
+        $config = new ConfigurationDefinition('desktop', 'prod');
         $config->addEntryPoint($entryPoint);
 
         $outputPath = $this->webpackConfig->compile($config);

@@ -7,8 +7,11 @@ use Twig_Environment;
 use Visca\JsPackager\Compiler\Webpack\Plugins\BundleAnalyzerPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\CommonsChunkPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\DuplicatePackageCheckerPlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\GenericPlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\MinChunkSizePlugin;
+use Visca\JsPackager\Compiler\Webpack\Plugins\ProvidePlugin;
 use Visca\JsPackager\Compiler\Webpack\Plugins\UglifyJsPlugin;
+use Visca\JsPackager\Compiler\Webpack\Loaders\JsonLoader;
 use Visca\JsPackager\Model\AliasResource;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\Model\Shim;
@@ -75,24 +78,22 @@ class WebpackConfig
         $aliases = $config->getAlias();
         $wpAlias = [];
         $publicPath = rtrim($this->rootDir.'/web', '/');
+        $shimmingModules = [];
         if (count($aliases) > 0) {
             foreach ($aliases as $alias) {
                 $resource = $alias->getResource();
                 $path = ltrim($resource->getPath(), '/');
                 $shims = $alias->getShims();
-                /* @TODO does not work totally... better put this in webpack.config.js instead.
-                 * if (count($shims) > 0) {
-                 * $shimCollection = [];
-                 * foreach ($shims as $shim) {
-                 * if ($shim instanceof Shim) {
-                 * $shimCollection[] = $shim->getGlobalVariable().'='.$shim->getModuleName();
-                 * }
-                 * }
-                 * $path = self::IMPORTS_LOADER.'?'.implode('&', $shimCollection).'!'.$publicPath.$path;
-                 * } else {
-                 */
+
+                if (count($shims) > 0) {
+                    foreach ($shims as $shim) {
+                        if ($shim instanceof Shim) {
+                            $shimmingModules[] = $shim;
+                        }
+                    }
+                }
+
                 $path = $publicPath.'/'.$path;
-//                }
 
                 $wpAlias[$alias->getName()] = $path;
             }
@@ -142,14 +143,28 @@ class WebpackConfig
         // -----------------
         $plugins = [];
         $plugins[] = new CommonsChunkPlugin($config);
-        $plugins[] = new UglifyJsPlugin();
+        if ($config->isMinifyEnabled()) {
+            $plugins[] = new UglifyJsPlugin();
+        }
         $plugins[] = new MinChunkSizePlugin();
         $plugins[] = new DuplicatePackageCheckerPlugin();
+        $plugins[] = new GenericPlugin('webpack2PolyfillPlugin', 'webpack2-polyfill-plugin');
 
         if ($debug) {
             $plugins[] = new BundleAnalyzerPlugin();
         }
 
+        $shimmingModules[] = new Shim('Promise', 'es6-promise');
+
+        if (count($shimmingModules) > 0) {
+            $plugins[] = new ProvidePlugin($shimmingModules);
+        }
+
+        // -----------------------
+        // Loaders
+        // -----------------------
+        $loaders = [];
+        $loaders[] = new JsonLoader();
 
         // -----------------------
         // require() calls to make
@@ -171,6 +186,7 @@ class WebpackConfig
                 'outputPath' => $config->getBuildOutputPath(),
                 'publicPath' => $config->getOutputPublicPath(),
                 'alias' => $wpAlias,
+                'loaders' => $loaders,
                 'plugins' => $plugins
             ]
         );

@@ -2,9 +2,11 @@
 
 namespace Visca\JsPackager\Tests\Functional;
 
+use Doctrine\Common\Cache\VoidCache;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Visca\JsPackager\Compiler\Config\WebpackConfig;
+use Visca\JsPackager\Compiler\Url\UrlProcessor;
 use Visca\JsPackager\Compiler\Webpack;
+use Visca\JsPackager\Compiler\Webpack\WebpackConfig;
 use Visca\JsPackager\Model\EntryPoint;
 use Visca\JsPackager\ConfigurationDefinition;
 use Visca\JsPackager\Model\StringResource;
@@ -52,11 +54,14 @@ class WebpackTest extends WebTestCase
             $template,
             $this->temporalPath
         );
+
         $this->compiler = new Webpack(
-            $this->webpackConfig
+            $this->webpackConfig,
+            $this->getContainer()->getParameter('kernel.root_dir'),
+            $this->getContainer()->getParameter('jspackager_node_path')
         );
 
-        $this->config = new ConfigurationDefinition('desktop');
+        $this->config = new ConfigurationDefinition('desktop', 'prod');
         $this->config->setBuildOutputPath($this->temporalPath.'/build');
         $this->config->setOutputPublicPath('/js/min/');
     }
@@ -66,6 +71,7 @@ class WebpackTest extends WebTestCase
      */
     public function testEmptyConfig()
     {
+        $this->markTestSkipped('Webpack does not allow no entry points anymore.');
         $output = $this->compiler->compileCollection($this->config);
 
         $this->assertCount(0, $output);

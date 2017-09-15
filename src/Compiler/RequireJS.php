@@ -14,19 +14,6 @@ use Visca\JsPackager\Compiler\Url\UrlProcessor;
  */
 class RequireJS extends AbstractCompiler
 {
-    /** @var UrlProcessor */
-    protected $urlProcessor;
-
-    /**
-     * AbstractCompiler constructor.
-     *
-     * @param UrlProcessor $urlProcessor
-     */
-    public function __construct(UrlProcessor $urlProcessor)
-    {
-        $this->urlProcessor = $urlProcessor;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -38,10 +25,17 @@ class RequireJS extends AbstractCompiler
     /**
      * {@inheritdoc}
      */
+    public function getStats()
+    {
+        return new PackageStats([]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function compile(EntryPoint $entryPoint, ConfigurationDefinition $config)
     {
         $pageName = $entryPoint->getName();
-        $this->debug = true;
 
         $script = sprintf(
             "<!-- JS for %s -->\n",
@@ -55,7 +49,7 @@ class RequireJS extends AbstractCompiler
         $externals = $config->getEntryPointsGlobalIncludes();
         if (is_array($externals)) {
             foreach ($externals as $ep) {
-                $script .= $this->addScriptTagExtended($ep->getResource()->getPath(), $config);
+                $script .= $this->addScript($ep->getResource()->getPath(), $config);
                 $script .= "\n";
             }
         }
@@ -69,7 +63,7 @@ class RequireJS extends AbstractCompiler
 
         $script .= '<script>';
 
-//         Include RequireJS inline configuration
+        // Include RequireJS inline configuration
         $script .= $this->compileRequireJsConfig($config)."\n";
 
         // Include inline Javascript page entry point
@@ -149,23 +143,5 @@ class RequireJS extends AbstractCompiler
             ).');';
 
         return $script;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function addScriptTagExtended($url, ConfigurationDefinition $config)
-    {
-        $url = $this->urlProcessor->processUrl($url, $config);
-
-        return parent::addScriptTag($url);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStats()
-    {
-        return new PackageStats([]);
     }
 }

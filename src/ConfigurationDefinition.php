@@ -43,6 +43,9 @@ class ConfigurationDefinition
     /** @var Alias[] */
     private $alias = [];
 
+    /** @var bool */
+    private $minifyEnabled;
+
     /**
      * ConfigurationDefinition constructor.
      *
@@ -52,6 +55,7 @@ class ConfigurationDefinition
     public function __construct($name, $environment)
     {
         $this->name = $name;
+        $this->minifyEnabled = true;
         $this->currentEnvironment = $environment;
     }
 
@@ -221,5 +225,25 @@ class ConfigurationDefinition
     public function getDomainInjectionEnvironment()
     {
         return $this->domainsInjectionEnvironment;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMinifyEnabled()
+    {
+        return $this->minifyEnabled;
+    }
+
+    /**
+     * @param bool $minifyEnabled
+     *
+     * @return $this
+     */
+    public function setMinifyEnabled($minifyEnabled)
+    {
+        $this->minifyEnabled = $minifyEnabled;
+
+        return $this;
     }
 }

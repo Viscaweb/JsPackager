@@ -11,7 +11,22 @@ use Visca\JsPackager\ConfigurationDefinition;
 abstract class AbstractCompiler implements CompilerInterface
 {
     /** @var boolean */
-    protected $debug = false;
+    protected $debug;
+
+    /** @var UrlProcessor */
+    protected $urlProcessor;
+
+    /**
+     * AbstractCompiler constructor.
+     *
+     * @param UrlProcessor $urlProcessor
+     * @param bool         $debug
+     */
+    public function __construct(UrlProcessor $urlProcessor = null, $debug = false)
+    {
+        $this->urlProcessor = $urlProcessor;
+        $this->debug = $debug;
+    }
 
     /**
      * @return boolean
@@ -33,14 +48,18 @@ abstract class AbstractCompiler implements CompilerInterface
         return $this;
     }
 
-
     /**
-     * @param string $url
+     * @param string                       $url
+     * @param ConfigurationDefinition|null $config
      *
      * @return string
      */
-    protected function addScriptTag($url)
+    protected function addScriptTag($url, ConfigurationDefinition $config = null)
     {
+        if(!is_null($config) && !is_null($this->urlProcessor)){
+            $url = $this->urlProcessor->processUrl($url, $config);
+        }
+
         $tag = '<script src="'.$url.'"></script>';
 
         return $tag;
