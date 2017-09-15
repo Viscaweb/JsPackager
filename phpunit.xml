@@ -13,7 +13,7 @@
         timeoutForLargeTests="69">
     <testsuites>
         <testsuite name="All">
-            <directory>Tests</directory>
+            <directory>src/Tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
