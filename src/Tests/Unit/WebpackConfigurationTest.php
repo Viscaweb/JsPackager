@@ -24,7 +24,7 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
     protected $resourcesPath;
 
     /** @var string */
-    protected $rootPath;
+    protected $workingPath;
 
     /** @var ConfigurationDefinition */
     protected $config;
@@ -41,10 +41,10 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->fixturesPath = \dirname($path, 2).'/Tests/fixtures/webpack2';
         $this->resourcesPath = \dirname($path, 2).'/resources';
-        $this->rootPath = \dirname($path, 5).'/var/tmp';
-        $tempPath = \dirname($path, 5).'/var/tmp';
+        $this->workingPath = \dirname($path, 2);
+        $tempPath = \dirname($path, 2).'/var/tmp';
 
-        $this->config = new ConfigurationDefinition('desktop', 'prod', \dirname($path, 2));
+        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
         $this->config->setOutputPublicPath('');
         $this->config->setBuildOutputPath('');
 
