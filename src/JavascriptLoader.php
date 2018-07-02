@@ -3,6 +3,7 @@
 namespace Visca\JsPackager;
 
 use Visca\JsPackager\Configuration\EntryPoint;
+use Visca\JsPackager\Configuration\ConfigurationDefinition;
 
 interface JavascriptLoader
 {

@@ -15,42 +15,37 @@ class RequireJSLoader implements JavascriptLoader
     /** @var ConfigurationDefinition */
     private $configuration;
 
-    public function __construct(ConfigurationDefinition $configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
     public function getPageJavascript(EntryPoint $entryPoint, ConfigurationDefinition $configuration): string
     {
-        $script = $this->buildScript($entryPoint);
+        $script = $this->buildScript($entryPoint, $configuration);
 
         return $script;
     }
 
-    private function buildScript(EntryPoint $entryPoint): string
+    private function buildScript(EntryPoint $entryPoint, ConfigurationDefinition $configuration): string
     {
         $script = '<script src="'.self::REQUIREJSLIB.'"></script>';
         $script .= "\n";
         $script.= '<script>';
-        $script.= $this->buildRequireJsConfig()."\n";
-        $script.= $this->buildEntryPoint($entryPoint);
+        $script.= $this->buildRequireJsConfig($configuration)."\n";
+        $script.= $this->buildEntryPoint($entryPoint, $configuration);
         $script.= '</script>';
 
         return $script;
     }
 
-    private function buildRequireJsConfig(): string
+    private function buildRequireJsConfig(ConfigurationDefinition $configuration): string
     {
         $data = [];
 
-        $outputPublicPath = $this->configuration->getOutputPublicPath();
+        $outputPublicPath = $configuration->getOutputPublicPath();
         if ($outputPublicPath !== null) {
             $outputPublicPath = trim($outputPublicPath, '/');
 
             $data['baseUrl'] = empty($outputPublicPath) ? '/' : '/'.$outputPublicPath.'/';
         }
 
-        $aliases = $this->configuration->getAlias();
+        $aliases = $configuration->getAlias();
         if (is_array($aliases)) {
             /** @var Alias $alias */
             foreach ($aliases as $alias) {
@@ -61,13 +56,13 @@ class RequireJSLoader implements JavascriptLoader
                     $aliasName = str_replace('$', '', $aliasName);
 
                     // We need to convert this path (absolute) to a URL.
-                    $url = $this->convertPathToURL($path, $this->configuration);
+                    $url = $this->convertPathToURL($path, $configuration);
                     //$data['paths'][$aliasName] = $this->urlProcessor->processUrl($url, $this->configuration);
                     $data['paths'][$aliasName] = $url;
                 }
 
                 $shims = $alias->getShims();
-                if (count($shims) > 0) {
+                if (\count($shims) > 0) {
                     $modules = [];
                     /** @var Shim $shim */
                     foreach ($shims as $shim) {
@@ -90,12 +85,12 @@ class RequireJSLoader implements JavascriptLoader
         return $script;
     }
 
-    private function buildEntryPoint(EntryPoint $entryPoint): string
+    private function buildEntryPoint(EntryPoint $entryPoint, ConfigurationDefinition $configuration): string
     {
         $script = '';
 
         // Include js required for all entry points
-        foreach ($this->configuration->getEntryPointsGlobalInline() as $gbEntryPoint) {
+        foreach ($configuration->getEntryPointsGlobalInline() as $gbEntryPoint) {
             $script.= $gbEntryPoint->getResource()->getContent()."\n";
         }
 
