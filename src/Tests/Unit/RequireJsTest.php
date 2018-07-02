@@ -2,7 +2,6 @@
 
 namespace Visca\JsPackager\Tests;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Visca\JsPackager\Configuration\Alias;
 use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\EntryPoint;
@@ -78,12 +77,13 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
         EntryPoint $entryPoint = null
     ) {
         $entryPoint = $entryPoint ?: new EntryPoint('xxx', new StringAssetResource(''));
+        //$config->addEntryPoint($entryPoint);
 
         $rootPath = \dirname(__DIR__, 2);
         $expectedJs = file_get_contents($rootPath. '/Tests/fixtures/requirejs/' . $expectedJsFile);
 
-        $loader = new RequireJSLoader($config);
-        $compiledJs = $loader->getPageJavascript($entryPoint);
+        $loader = new RequireJSLoader();
+        $compiledJs = $loader->getPageJavascript($entryPoint, $config);
 
         $this->assertEquals(trim($expectedJs), trim($compiledJs));
     }
@@ -98,8 +98,8 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->urlProcessor = new UrlProcessor(new ArrayCache(), '');
-        $this->urlProcessor->setCacheBustingEnabled(false);
+//        $this->urlProcessor = new UrlProcessor(new ArrayCache(), '');
+//        $this->urlProcessor->setCacheBustingEnabled(false);
 
         $this->config = new ConfigurationDefinition('desktop', 'prod', \dirname(__DIR__, 2));
     }

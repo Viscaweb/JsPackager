@@ -57,7 +57,7 @@ class RequireJSLoader implements JavascriptLoader
 
                     // We need to convert this path (absolute) to a URL.
                     $url = $this->convertPathToURL($path, $configuration);
-                    //$data['paths'][$aliasName] = $this->urlProcessor->processUrl($url, $this->configuration);
+                    //$data['paths'][$aliasName] = $this->urlProcessor->processUrl($url, $configuration);
                     $data['paths'][$aliasName] = $url;
                 }
 
@@ -96,13 +96,13 @@ class RequireJSLoader implements JavascriptLoader
 
         // Include js of required entry point
         $pageName = $entryPoint->getName();
-        foreach ($this->configuration->getEntryPoints() as $ep) {
+        foreach ($configuration->getEntryPoints() as $ep) {
             if ($ep->getName() === $pageName) {
                 $script .= $ep->getResource()->getContent();
             }
         }
 
-        return !empty($script) ? "\n".$script : '';
+        return !empty($script) ? $script."\n" : '';
     }
 
     private function convertPathToURL($path, ConfigurationDefinition $config)
