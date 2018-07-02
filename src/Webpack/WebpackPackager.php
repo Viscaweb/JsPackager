@@ -24,6 +24,10 @@ class WebpackPackager implements JavascriptPackager
         $this->nodeJsShellExecutor = $nodeJsShellExecutor;
     }
 
+    public function getName(): string
+    {
+        return 'webpack';
+    }
 
     public function package(ConfigurationDefinition $configuration)
     {
