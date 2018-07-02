@@ -1,0 +1,41 @@
+'use strict';
+// Require modules
+{{# modules }}
+{{.}}
+{{/ modules }}
+
+const outputConfig = {
+    filename: '[name].dist.js',
+    chunkFilename: '[id].dist.js',
+    path: '{{outputPath}}',
+    publicPath: '{{outputPublicPath}}'
+};
+
+const entriesConfig = {};
+{{#entryPoints}}
+entriesConfig['{{getName}}'] = '{{getResource.getPath}}';
+{{/entryPoints}}
+
+const aliasConfig = {};
+{{#aliases}}
+    aliasConfig['{{getName}}'] = '{{getResource.getPath}}';
+{{/aliases}}
+
+const loadersConfig = [];
+
+const pluginsConfig = [];
+{{#plugins}}
+    pluginsConfig.push(new {{name}}({{{javascriptSerialize}}}));
+{{/plugins}}
+
+module.exports = {
+    entry: entriesConfig,
+    output: outputConfig,
+    resolve: {
+        alias: aliasConfig
+    },
+    module: {
+        loaders: loadersConfig
+    },
+    plugins: pluginsConfig
+};
