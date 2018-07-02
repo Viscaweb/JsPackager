@@ -50,7 +50,7 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->webpackConfigBuilder = new WebpackConfigBuilder(
             $this->engine,
-            '/web',
+//            '/web',
             realpath($this->resourcesPath.'/webpack.config.v2.mustache'),
             $tempPath
         );

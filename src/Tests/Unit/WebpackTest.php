@@ -70,7 +70,7 @@ class WebpackTest extends \PHPUnit_Framework_TestCase
 */
         return new WebpackConfigBuilder(
             $engine,
-            '/web',
+//            '/web',
             $this->resourcesPath.'/webpack.config.v2.mustache',
             $this->tempPath
         );

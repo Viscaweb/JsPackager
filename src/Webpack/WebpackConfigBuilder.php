@@ -20,7 +20,7 @@ use Visca\JsPackager\Webpack\Plugins\UglifyJsPlugin;
 class WebpackConfigBuilder
 {
     /** @var string */
-    protected $publicDir;
+//    protected $publicDir;
 
     /** @var TemplateEngine */
     protected $engine;
@@ -36,7 +36,7 @@ class WebpackConfigBuilder
 
     public function __construct(
         TemplateEngine $engine,
-        string $publicDir,
+//        string $publicDir,
         string $templatePath,
         ?string $temporalPath = null,
         array $plugins = []
@@ -44,7 +44,7 @@ class WebpackConfigBuilder
         FileSystem::ensureDirExists($temporalPath);
 
         $this->engine = $engine;
-        $this->publicDir = $publicDir;
+//        $this->publicDir = $publicDir;
         $this->temporalPath = realpath($temporalPath);
         $this->templatePath = $templatePath;
         $this->plugins = $plugins;
