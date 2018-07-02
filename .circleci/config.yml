@@ -19,6 +19,7 @@ jobs:
     steps:
       - checkout
       - run: 'composer install --no-interaction --no-progress'
+      - run: 'npm install'
 
       - save_cache:
           paths:
