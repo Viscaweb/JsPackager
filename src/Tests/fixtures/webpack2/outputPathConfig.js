@@ -1,11 +1,10 @@
 'use strict';
-// Require modules
 
 const outputConfig = {
-    filename: '[name].dist.js',
-    chunkFilename: '[id].dist.js',
-    path: '',
-    publicPath: 'js/'
+    "filename": "[name].dist.js",
+    "chunkFilename": "[id].dist.js",
+    "path": "",
+    "publicPath": "js/"
 };
 
 const entriesConfig = {};

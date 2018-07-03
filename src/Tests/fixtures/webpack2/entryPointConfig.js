@@ -1,15 +1,14 @@
 'use strict';
-// Require modules
 
 const outputConfig = {
-    filename: '[name].dist.js',
-    chunkFilename: '[id].dist.js',
-    path: '',
-    publicPath: '/'
+    "filename": "[name].dist.js",
+    "chunkFilename": "[id].dist.js",
+    "path": "",
+    "publicPath": "/"
 };
 
 const entriesConfig = {};
-entriesConfig['matchPage'] = '%outputPath%/fixtures/match.page.js';
+entriesConfig['matchPage'] = "%outputPath%/fixtures/match.page.js";
 
 const aliasConfig = {};
 

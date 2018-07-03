@@ -13,7 +13,7 @@ const outputConfig = {
 
 const entriesConfig = {};
 {{#entryPoints}}
-entriesConfig['{{getName}}'] = '{{getResource.getPath}}';
+entriesConfig['{{getName}}'] = '{{{getResource.getPath}}}';
 {{/entryPoints}}
 
 const aliasConfig = {};

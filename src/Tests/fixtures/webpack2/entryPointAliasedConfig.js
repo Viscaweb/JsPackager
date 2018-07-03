@@ -8,6 +8,11 @@ const outputConfig = {
 };
 
 const entriesConfig = {};
+entriesConfig['vendor0-desktop'] = [
+    "jquery",
+    "bootstrap",
+    "socket.io"
+];
 
 const aliasConfig = {};
 

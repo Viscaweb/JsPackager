@@ -19,11 +19,16 @@ class AliasAssetResource implements AssetResource
 
     public function getPath(): string
     {
-        return json_encode($this->alias);
+        return $this->alias;
     }
 
     public function getContent(): string
     {
         return '';
+    }
+
+    public function getAliases(): array
+    {
+        return $this->alias;
     }
 }

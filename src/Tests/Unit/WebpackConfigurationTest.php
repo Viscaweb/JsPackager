@@ -6,9 +6,11 @@ use Visca\JsPackager\Configuration\Alias;
 use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\EntryPoint;
 use Visca\JsPackager\Configuration\Shim;
+use Visca\JsPackager\Resource\AliasAssetResource;
 use Visca\JsPackager\Resource\FileAssetResource;
 use Visca\JsPackager\Resource\FileOnDemandAssetResource;
 use Visca\JsPackager\TemplateEngine\MustacheEngine;
+use Visca\JsPackager\TemplateEngine\PHPEngine;
 use Visca\JsPackager\TemplateEngine\TemplateEngine;
 use Visca\JsPackager\Webpack\WebpackConfigBuilder;
 
@@ -40,10 +42,11 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $path = __DIR__;
-        $this->engine = new MustacheEngine(new \Mustache_Engine());
+//        $this->engine = new MustacheEngine(new \Mustache_Engine());
+        $this->engine = new PHPEngine();
 
         $this->fixturesPath = \dirname($path, 2).'/Tests/fixtures/webpack2';
-        $this->resourcesPath = \dirname($path, 2).'/resources';
+        $this->resourcesPath = \dirname($path, 3).'/resources';
         $this->workingPath = \dirname($path, 2);
         $this->tempPath = \dirname($path, 3).'/var/tmp';
 
@@ -54,7 +57,8 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->webpackConfigBuilder = new WebpackConfigBuilder(
             $this->engine,
 //            '/web',
-            realpath($this->resourcesPath.'/webpack.config.v2.mustache'),
+//            realpath($this->resourcesPath.'/webpack.config.v2.mustache'),
+            realpath($this->resourcesPath.'/webpack.config.v2.php'),
             $this->tempPath
         );
     }
@@ -157,17 +161,44 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $output);
     }
 
+    public function testEntryPointWithAliasCollection()
+    {
+        $aliasResource = new AliasAssetResource(['jquery', 'bootstrap', 'socket.io']);
+        $entryPoint = new EntryPoint('vendor0-desktop', $aliasResource);
+        $this->config->addEntryPoint($entryPoint);
+
+        $outputPath = $this->webpackConfigBuilder->generateConfigurationFile($this->config);
+        $output = file_get_contents($outputPath);
+        $expected = file_get_contents($this->fixturesPath.'/entryPointAliasedConfig.js');
+
+        $expected = str_replace(
+            '%outputPath%',
+            $this->resourcesPath,
+            $expected
+        );
+
+        $this->assertEquals($expected, $output);
+    }
+
     public function testEntryPointFromContent()
     {
         $id = 'matchPage';
         $entryPoint = new EntryPoint(
             $id,
-            new FileOnDemandAssetResource($id,'console.log(\'hello\');', $this->tempPath.'/hello.js')
+            new FileOnDemandAssetResource($id,'console.log(\'hello\');', $this->tempPath)
         );
 
         $this->config->addEntryPoint($entryPoint);
 
-        $result = $this->webpackConfigBuilder->generateConfigurationFile($this->config);
-        $this->assertNotEmpty($result);
+        $outputPath = $this->webpackConfigBuilder->generateConfigurationFile($this->config);
+        $output = file_get_contents($outputPath);
+        $expected = file_get_contents($this->fixturesPath.'/entryPointFromContentConfig.js');
+
+        $expected = str_replace(
+            '%outputPath%',
+            realpath($this->workingPath.'/../'),
+            $expected
+        );
+        $this->assertEquals($expected, $output);
     }
 }

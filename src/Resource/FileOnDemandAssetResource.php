@@ -36,12 +36,13 @@ class FileOnDemandAssetResource implements AssetResource
 
     public function getPath(): string
     {
-        $result = file_put_contents($this->temporalPath, $this->content);
+        $path = $this->temporalPath.'/'.$this->id.'.js';
+        $result = file_put_contents($path, $this->content);
         if ($result === false) {
-            throw new \RuntimeException('Could not save temporal file for FileOnDemandAssetResource at "'.$this->temporalPath.'"');
+            throw new \RuntimeException('Could not save temporal file for FileOnDemandAssetResource at "'.$path.'"');
         }
 
-        return $this->temporalPath.'/'.$this->id.'.js';
+        return $path;
     }
 
     public function getUrl(): string

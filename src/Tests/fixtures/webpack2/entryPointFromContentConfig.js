@@ -1,41 +1,29 @@
 'use strict';
-var webpack = require('webpack');
+
+const outputConfig = {
+    "filename": "[name].dist.js",
+    "chunkFilename": "[id].dist.js",
+    "path": "",
+    "publicPath": "/"
+};
+
+const entriesConfig = {};
+entriesConfig['matchPage'] = "%outputPath%/var/tmp/matchPage.js";
+
+const aliasConfig = {};
+
+const loadersConfig = [];
+
+const pluginsConfig = [];
+
 module.exports = {
-
-    // Entry points for the application
-    entry : {
-                "matchPage": "%outputPath%/matchPage.entry_point.js"
-            },
-
-    output: {
-        filename: "[name].dist.js",
-        chunkFilename: "[id].dist.js",
-
-        // The base directory (absolute path) for resolving
-        // the entry option.
-        path: '',
-        publicPath: ''
-    },
-
+    entry: entriesConfig,
+    output: outputConfig,
     resolve: {
-        alias: []
+        alias: aliasConfig
     },
-
     module: {
-        loaders: [
-            // Disable AMD @todo To check.
-            {
-                test: /bootstrap/,
-                loader: "imports-loader?$=jquery"
-            }
-        ]
+        loaders: loadersConfig
     },
-
-    plugins: [
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.CommonsChunkPlugin({
-            "name": "commons.js",
-        }),
-        //new webpack.optimize.UglifyJsPlugin()
-    ]
+    plugins: pluginsConfig
 };

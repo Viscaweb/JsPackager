@@ -1,18 +1,17 @@
 'use strict';
-// Require modules
 
 const outputConfig = {
-    filename: '[name].dist.js',
-    chunkFilename: '[id].dist.js',
-    path: '',
-    publicPath: '/'
+    "filename": "[name].dist.js",
+    "chunkFilename": "[id].dist.js",
+    "path": "",
+    "publicPath": "/"
 };
 
 const entriesConfig = {};
 
 const aliasConfig = {};
-    aliasConfig['jquery'] = 'js/vendor/jquery.min.js';
-    aliasConfig['bootstrap'] = 'js/vendor/bootstrap.min.js';
+aliasConfig['jquery'] = "js/vendor/jquery.min.js";
+aliasConfig['bootstrap'] = "js/vendor/bootstrap.min.js";
 
 const loadersConfig = [];
 
