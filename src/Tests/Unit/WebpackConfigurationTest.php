@@ -50,7 +50,7 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->workingPath = \dirname($path, 2);
         $this->tempPath = \dirname($path, 3).'/var/tmp';
 
-        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
+        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath, $this->workingPath);
         $this->config->setOutputPublicPath('');
         $this->config->setBuildOutputPath('');
 
@@ -94,7 +94,8 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testResolveAlias()
     {
-        $jquery = new Alias('jquery', new FileAssetResource('js/vendor/jquery.min.js'));
+        $path = $this->resourcesPath.'/js/vendor/jquery.min.js';
+        $jquery = new Alias('jquery', new FileAssetResource($path, $path));
 
         $this->config->addAlias($jquery);
 
@@ -117,13 +118,15 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testResolveAliasWithShim()
     {
-        $resource = new FileAssetResource('js/vendor/jquery.min.js');
+        $path = $this->resourcesPath.'/js/vendor/jquery.min.js';
+        $resource = new FileAssetResource($path, $path);
         $jquery = new Alias('jquery', $resource);
         $this->config->addAlias($jquery);
 
         $shim = new Shim('$', 'jquery');
 
-        $resource = new FileAssetResource('js/vendor/bootstrap.min.js');
+        $path = $this->resourcesPath.'/js/vendor/bootstrap.min.js';
+        $resource = new FileAssetResource($path, $path);
         $bootstrap = new Alias('bootstrap', $resource, [$shim]);
         $this->config->addAlias($bootstrap);
 
@@ -145,7 +148,8 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testEntryPointFromUrlConfig()
     {
-        $entryPoint = new EntryPoint('matchPage', new FileAssetResource($this->resourcesPath.'/fixtures/match.page.js'));
+        $path = $this->resourcesPath.'/fixtures/match.page.js';
+        $entryPoint = new EntryPoint('matchPage', new FileAssetResource($path, $path));
         $this->config->addEntryPoint($entryPoint);
 
         $outputPath = $this->webpackConfigBuilder->generateConfigurationFile($this->config);

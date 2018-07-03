@@ -14,9 +14,12 @@ class WebpackTest extends \PHPUnit_Framework_TestCase
 {
     public function testPackageFileHelloWorld()
     {
-        $config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
+        $config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath, $this->workingPath);
         $config->setBuildOutputPath($this->tempPath);
-        $config->addEntryPoint(new EntryPoint('home', new FileAssetResource($this->fixturesPath.'/src/hello.world.js')));
+
+        $path = $this->fixturesPath.'/src/hello.world.js';
+        $config->addEntryPoint(new EntryPoint(
+            'home', new FileAssetResource($path, $path)));
 
         $report = $this->compile($config);
 

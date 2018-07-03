@@ -10,8 +10,8 @@ const outputConfig = {
 const entriesConfig = {};
 
 const aliasConfig = {};
-aliasConfig['jquery'] = "js/vendor/jquery.min.js";
-aliasConfig['bootstrap'] = "js/vendor/bootstrap.min.js";
+aliasConfig['jquery'] = "%rootPath%/js/vendor/jquery.min.js";
+aliasConfig['bootstrap'] = "%rootPath%/js/vendor/bootstrap.min.js";
 
 const loadersConfig = [];
 

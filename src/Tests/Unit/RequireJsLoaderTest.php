@@ -9,9 +9,8 @@ use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\RequireJS\RequireJSLoader;
 use Visca\JsPackager\Resource\FileAssetResource;
 use Visca\JsPackager\Resource\FileOnDemandAssetResource;
-use Visca\JsPackager\Compiler\Url\UrlProcessor;
 
-class RequireJsTest extends \PHPUnit_Framework_TestCase
+class RequireJsLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmptyConfig()
     {
@@ -28,7 +27,8 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
 
     public function testAlias()
     {
-        $jquery = new Alias('jquery', new FileAssetResource('js/jquery.min.js'));
+        $url = '/js/jquery.min.js';
+        $jquery = new Alias('jquery', new FileAssetResource($url, $url));
 
         $config = clone $this->config;
         $config->addAlias($jquery);
@@ -39,7 +39,8 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
     public function testShim()
     {
         $shim = new Shim('$', 'jquery');
-        $bootstrap = new Alias('bootstrap', new FileAssetResource('js/bootstrap.min.js'), [$shim]);
+        $url = '/js/bootstrap.min.js';
+        $bootstrap = new Alias('bootstrap', new FileAssetResource($url, $url), [$shim]);
 
         $config = clone $this->config;
         $config->addAlias($bootstrap);
@@ -62,11 +63,12 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
     public function testUrlCacheBust()
     {
         $this->markTestSkipped();
-        $jquery = new Alias('jquery', new FileAssetResource('js/jquery.min.js'));
+        $url = '/js/jquery.min.js';
+        $jquery = new Alias('jquery', new FileAssetResource($url, $url));
 
         $config = clone $this->config;
         $config->addAlias($jquery);
-        $this->urlProcessor->setCacheBustingEnabled(true);
+        //$this->urlProcessor->setCacheBustingEnabled(true);
 
         $this->assertJavascriptEquals('cacheBusting.js', $config);
     }
@@ -95,8 +97,8 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigurationDefinition */
     private $config;
 
-    /** @var UrlProcessor */
-    protected $urlProcessor;
+    ///** @var UrlProcessor */
+    //protected $urlProcessor;
 
     /** @var string */
     protected $workingPath;
@@ -111,6 +113,6 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
         $this->workingPath = \dirname(__DIR__, 2);
         $this->tempPath = \dirname(__DIR__, 3).'/var/tmp';
 
-        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
+        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath, $this->workingPath);
     }
 }
