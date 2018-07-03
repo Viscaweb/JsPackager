@@ -7,9 +7,13 @@ class FileAssetResource implements AssetResource
     /** @var string */
     protected $path;
 
-    public function __construct(string $path)
+    /** @var string */
+    protected $publicUrl;
+
+    public function __construct(string $path, string $publicUrl)
     {
         $this->path = $path;
+        $this->publicUrl = $publicUrl;
     }
 
     public function getContent(): string
@@ -24,6 +28,6 @@ class FileAssetResource implements AssetResource
 
     public function getUrl(): string
     {
-        return 'string://memory';
+        return $this->publicUrl;
     }
 }

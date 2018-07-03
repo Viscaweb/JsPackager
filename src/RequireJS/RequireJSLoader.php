@@ -49,14 +49,15 @@ class RequireJSLoader implements JavascriptLoader
         if (is_array($aliases)) {
             /** @var Alias $alias */
             foreach ($aliases as $alias) {
-                $path = $alias->getResource()->getPath();
+                //$path = $alias->getResource()->getPath();
+                $url = $alias->getResource()->getUrl();
 
-                if ($path !== null) {
+                if ($url !== null) {
                     $aliasName = $alias->getName();
                     $aliasName = str_replace('$', '', $aliasName);
 
                     // We need to convert this path (absolute) to a URL.
-                    $url = $this->convertPathToURL($path, $configuration);
+                    //$url = $this->convertPathToURL($path, $configuration);
                     //$data['paths'][$aliasName] = $this->urlProcessor->processUrl($url, $configuration);
                     $data['paths'][$aliasName] = $url;
                 }
@@ -107,7 +108,7 @@ class RequireJSLoader implements JavascriptLoader
 
     private function convertPathToURL($path, ConfigurationDefinition $config)
     {
-//        return '/'.str_replace($config->getWorkingPath().$config->getOutputPublicPath(), '', $path);
+//        return '/'.str_replace($config->getProjectRootPath().$config->getOutputPublicPath(), '', $path);
         return '/'.ltrim($path, '/');
     }
 }

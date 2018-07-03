@@ -23,7 +23,10 @@ class ConfigurationDefinition
      * @var string Path from where to run the build programs. Usually `%kernel.root_dir%/../`
      *             This is useful so compiler finds ./node_modules/.bin
      */
-    private $workingPath;
+    private $projectRootPath;
+
+    /** @var string Path to the folder were the site is served. Usually /<fullpath>/web */
+    private $publicProjectPath;
 
     /** @var string Where to store output files */
     private $buildOutputPath;
@@ -49,12 +52,13 @@ class ConfigurationDefinition
     /** @var bool */
     private $minifyEnabled;
 
-    public function __construct(string $name, string $environment, string $workingPath)
+    public function __construct(string $name, string $environment, string $projectRootPath, string $publicProjectPath)
     {
         $this->name = $name;
         $this->minifyEnabled = true;
         $this->currentEnvironment = $environment;
-        $this->workingPath = $workingPath;
+        $this->projectRootPath = $projectRootPath;
+        $this->publicProjectPath = $publicProjectPath;
     }
 
     /**
@@ -110,7 +114,7 @@ class ConfigurationDefinition
      *
      * @return ConfigurationDefinition
      */
-    public function setBuildOutputPath($buildOutputPath)
+    public function setBuildOutputPath(string $buildOutputPath)
     {
         $this->buildOutputPath = $buildOutputPath;
 
@@ -123,7 +127,7 @@ class ConfigurationDefinition
      *
      * @return $this
      */
-    public function setDomainsInjection($environment, $domains)
+    public function setDomainsInjection(string $environment, array $domains)
     {
         $this->domainsInjectionEnvironment = $environment;
         $this->domainsInjection = $domains;
@@ -134,7 +138,7 @@ class ConfigurationDefinition
     /**
      * @return string[]
      */
-    public function getDomainsInjection()
+    public function getDomainsInjection(): array
     {
         return $this->domainsInjection;
     }
@@ -225,8 +229,13 @@ class ConfigurationDefinition
         return $this;
     }
 
-    public function getWorkingPath(): string
+    public function getProjectRootPath(): string
     {
-        return $this->workingPath;
+        return $this->projectRootPath;
+    }
+
+    public function getPublicProjectPath(): string
+    {
+        return $this->publicProjectPath;
     }
 }

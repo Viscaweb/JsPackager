@@ -45,7 +45,7 @@ class WebpackPackager implements JavascriptPackager
 
         $output = $this->nodeJsShellExecutor->run(
             self::BINARY_WEBPACK . ' --json --config ' . $webpackConfigFile,
-            $config->getWorkingPath()
+            $config->getProjectRootPath()
         );
 
         // Analyze output
