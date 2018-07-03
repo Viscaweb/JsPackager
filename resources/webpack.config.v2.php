@@ -7,13 +7,15 @@
  * @var \Visca\JsPackager\Configuration\Alias[] $aliases
  */
 
+use Visca\JsPackager\TemplateEngine\PHPEngine;
+
 echo "'use strict';\n\n";
 
 foreach ($modules as $module) {
     echo $module;
 }
 
-echo 'const outputConfig = '.jsonEncode([
+echo 'const outputConfig = '.PHPEngine::jsonEncode([
         'filename' => '[name].dist.js',
         'chunkFilename' => '[id].dist.js',
         'path' => $outputPath,
@@ -33,7 +35,7 @@ foreach ($entryPoints as $entry) {
 
         case ($resource instanceof \Visca\JsPackager\Resource\AliasAssetResource):
             /** @var \Visca\JsPackager\Resource\AliasAssetResource $resource */
-            $value = jsonEncode($resource->getAliases());
+            $value = PHPEngine::jsonEncode($resource->getAliases());
             break;
     }
     echo "entriesConfig['".$entry->getName()."'] = ".$value.";\n";
@@ -52,7 +54,7 @@ foreach ($aliases as $alias) {
 
         case ($resource instanceof \Visca\JsPackager\Resource\AliasAssetResource):
             /** @var \Visca\JsPackager\Resource\AliasAssetResource $resource */
-            $value = jsonEncode($resource->getAliases());
+            $value = PHPEngine::jsonEncode($resource->getAliases());
             break;
     }
     echo "aliasConfig['".$alias->getName()."'] = ".$value.";\n";
@@ -65,7 +67,7 @@ echo "\n";
 echo "const pluginsConfig = [];\n";
 /** @var \Visca\JsPackager\Webpack\Plugins\PluginDescriptorInterface $plugins */
 foreach ($plugins as $plugin) {
-    echo "pluginsConfig.push(new ".$plugin->name()."(".jsonEncode($plugin->getOptions())."));";
+    echo "pluginsConfig.push(new ".$plugin->name()."(".PHPEngine::jsonEncode($plugin->getOptions())."));";
 }
 
 
@@ -81,10 +83,3 @@ module.exports = {
     },
     plugins: pluginsConfig
 };";
-
-if (!function_exists('jsonEncode')) {
-    function jsonEncode($data)
-    {
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    }
-}

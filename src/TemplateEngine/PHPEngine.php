@@ -17,4 +17,9 @@ class PHPEngine implements TemplateEngine
 
         return ob_get_clean();
     }
+
+    public static function jsonEncode($data)
+    {
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
 }
