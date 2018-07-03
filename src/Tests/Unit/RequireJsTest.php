@@ -2,21 +2,20 @@
 
 namespace Visca\JsPackager\Tests;
 
-use Doctrine\Common\Cache\VoidCache;
+use Visca\JsPackager\Configuration\Alias;
+use Visca\JsPackager\Configuration\ConfigurationDefinition;
+use Visca\JsPackager\Configuration\EntryPoint;
+use Visca\JsPackager\Configuration\Shim;
+use Visca\JsPackager\RequireJS\RequireJSLoader;
+use Visca\JsPackager\Resource\FileAssetResource;
+use Visca\JsPackager\Resource\FileOnDemandAssetResource;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
-use Visca\JsPackager\Model\EntryPoint;
-use Visca\JsPackager\Model\Alias;
-use Visca\JsPackager\Model\FileResource;
-use Visca\JsPackager\ConfigurationDefinition;
-use Visca\JsPackager\Compiler\RequireJS;
-use Visca\JsPackager\Model\Shim;
-use Visca\JsPackager\Model\StringResource;
 
 class RequireJsTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmptyConfig()
     {
-        $this->assertJavascriptEquals('requireJsExpected/emptyConfig.js', $this->config);
+        $this->assertJavascriptEquals('emptyConfig.js', $this->config);
     }
 
     public function testBaseUrl()
@@ -24,73 +23,94 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
         $config = clone $this->config;
         $config->setOutputPublicPath('/web/');
 
-        $this->assertJavascriptEquals('requireJsExpected/baseUrl.js', $config);
+        $this->assertJavascriptEquals('baseUrl.js', $config);
     }
 
     public function testAlias()
     {
-        $jquery = new Alias('jquery', new FileResource('js/jquery.min.js'));
+        $jquery = new Alias('jquery', new FileAssetResource('js/jquery.min.js'));
 
         $config = clone $this->config;
         $config->addAlias($jquery);
 
-        $this->assertJavascriptEquals('requireJsExpected/alias.js', $config);
+        $this->assertJavascriptEquals('alias.js', $config);
     }
 
     public function testShim()
     {
         $shim = new Shim('$', 'jquery');
-        $bootstrap = new Alias('bootstrap', new FileResource('js/bootstrap.min.js'), [$shim]);
+        $bootstrap = new Alias('bootstrap', new FileAssetResource('js/bootstrap.min.js'), [$shim]);
 
         $config = clone $this->config;
         $config->addAlias($bootstrap);
 
-        $this->assertJavascriptEquals('requireJsExpected/shim.js', $config);
+        $this->assertJavascriptEquals('shim.js', $config);
     }
 
     public function testEntryPoint()
     {
-        $resource = new StringResource('console.log(\'hello\');');
-        $entryPoint = new EntryPoint('xxx', $resource);
+        $id = 'xxx';
+        $resource = new FileOnDemandAssetResource($id, 'console.log(\'hello\');', $this->tempPath.'/hello.js');
+        $entryPoint = new EntryPoint($id, $resource);
 
         $config = clone $this->config;
         $config->addEntryPoint($entryPoint);
 
-        $this->assertJavascriptEquals('requireJsExpected/entryPoints.js', $config, $entryPoint);
+        $this->assertJavascriptEquals('entryPoints.js', $config, $entryPoint);
+    }
+
+    public function testUrlCacheBust()
+    {
+        $this->markTestSkipped();
+        $jquery = new Alias('jquery', new FileAssetResource('js/jquery.min.js'));
+
+        $config = clone $this->config;
+        $config->addAlias($jquery);
+        $this->urlProcessor->setCacheBustingEnabled(true);
+
+        $this->assertJavascriptEquals('cacheBusting.js', $config);
     }
 
     /**
-     * @param string                  $expectedJsFile
-     * @param ConfigurationDefinition $config
-     * @param EntryPoint|null         $entryPoint
      */
     private function assertJavascriptEquals(
-        $expectedJsFile,
+        string $expectedJsFile,
         ConfigurationDefinition $config,
         EntryPoint $entryPoint = null
     ) {
-        $entryPoint = $entryPoint ?: new EntryPoint('xxx', new StringResource(''));
+        $id = 'xxx';
+        $entryPoint = $entryPoint ?: new EntryPoint(
+            $id,
+            new FileOnDemandAssetResource($id, '', $this->tempPath.'/xxx.js'));
 
-        $expectedJs = file_get_contents(__DIR__ . '/' . $expectedJsFile);
-        $compiledJs = $this->compiler->compile($entryPoint, $config);
+        $rootPath = \dirname(__DIR__, 2);
+        $expectedJs = file_get_contents($rootPath. '/Tests/fixtures/requirejs/' . $expectedJsFile);
 
-        $this->assertEquals($expectedJs, $compiledJs);
+        $loader = new RequireJSLoader();
+        $compiledJs = $loader->getPageJavascript($entryPoint, $config);
+
+        $this->assertEquals(trim($expectedJs), trim($compiledJs));
     }
-
-    /** @var RequireJS */
-    private $compiler;
 
     /** @var ConfigurationDefinition */
     private $config;
+
+    /** @var UrlProcessor */
+    protected $urlProcessor;
+
+    /** @var string */
+    protected $workingPath;
+
+    /** @var string */
+    protected $tempPath;
 
     public function setUp()
     {
         parent::setUp();
 
-        $urlProcessor = new UrlProcessor(new VoidCache(), '');
-        $urlProcessor->setCacheBustingEnabled(false);
-        $this->compiler = new RequireJS($urlProcessor);
+        $this->workingPath = \dirname(__DIR__, 2);
+        $this->tempPath = \dirname(__DIR__, 3).'/var/tmp';
 
-        $this->config = new ConfigurationDefinition('desktop', 'prod');
+        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
     }
 }

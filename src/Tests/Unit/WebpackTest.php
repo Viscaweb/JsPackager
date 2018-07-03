@@ -1,63 +1,78 @@
 <?php
 
-namespace Visca\JsPackager\Tests\Functional;
+namespace Visca\JsPackager\Tests\Unit;
 
-use Visca\JsPackager\Compiler\Storage\CompiledFileStorage;
-use Visca\JsPackager\Compiler\Storage\Exceptions\UnableToProvideScriptException;
-use Visca\JsPackager\Compiler\Webpack;
-use Visca\JsPackager\ConfigurationDefinition;
-use Visca\JsPackager\Model\EntryPoint;
+use Visca\JsPackager\Configuration\ConfigurationDefinition;
+use Visca\JsPackager\Configuration\EntryPoint;
+use Visca\JsPackager\Resource\FileAssetResource;
+use Visca\JsPackager\Shell\NodeJsShellExecutor;
+use Visca\JsPackager\TemplateEngine\MustacheEngine;
+use Visca\JsPackager\Webpack\WebpackConfigBuilder;
+use Visca\JsPackager\Webpack\WebpackPackager;
 
 class WebpackTest extends \PHPUnit_Framework_TestCase
 {
+    public function testPackageFileHelloWorld()
+    {
+        $config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
+        $config->setBuildOutputPath($this->tempPath);
+        $config->addEntryPoint(new EntryPoint('home', new FileAssetResource($this->fixturesPath.'/src/hello.world.js')));
 
-    public function testNotFoundJsThrowsException(){
-        $this->expectException(UnableToProvideScriptException::class);
-        $this->compile($this->createStorage(null));
+        $report = $this->compile($config);
+
+        $this->assertCount(0, $report->getErrors());
+        $this->assertEquals('home', $report->getAssets('home')->getId());
     }
 
-    public function testValidJsReturnsTheContent()
-    {
-        $javascript = 'myJsFunction(1);';
 
-        $this->assertEquals(
-            $this->compile($this->createStorage($javascript)),
-            $javascript
+
+    /** @var string */
+    protected $fixturesPath;
+
+    /** @var string */
+    protected $resourcesPath;
+
+    /** @var string */
+    protected $tempPath;
+
+    /** @var string */
+    protected $workingPath;
+
+    public function setUp()
+    {
+        $path = __DIR__;
+        $this->workingPath = \dirname($path, 3);
+        $this->fixturesPath = $this->workingPath.'/src/Tests/fixtures/webpack2';
+        $this->resourcesPath = $this->workingPath.'/src/resources';
+        $this->tempPath = $this->workingPath.'/var/tmp';
+    }
+
+    private function compile(ConfigurationDefinition $config)
+    {
+        $nodeModulesPath = '/node_modules';
+        $nodeShellExecuter = new NodeJsShellExecutor('/usr/local/bin/node', $nodeModulesPath);
+        $webpackBuilder = $this->webpackBuilder($config);
+
+        return (new WebpackPackager(
+            $webpackBuilder,
+            $nodeShellExecuter
+        ))->package($config);
+    }
+
+    private function webpackBuilder(ConfigurationDefinition $config)
+    {
+        $path = __DIR__;
+        $engine = new MustacheEngine(new \Mustache_Engine());
+/*
+        $config = new ConfigurationDefinition('desktop', 'prod', \dirname($path, 2));
+        $config->setOutputPublicPath('');
+        $config->setBuildOutputPath('');
+*/
+        return new WebpackConfigBuilder(
+            $engine,
+//            '/web',
+            $this->resourcesPath.'/webpack.config.v2.mustache',
+            $this->tempPath
         );
-    }
-
-    /**
-     * @param null $jsToReturn
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function createStorage($jsToReturn = null){
-        $storage = $this->getMockBuilder(CompiledFileStorage::class)->getMock();
-
-        if ($jsToReturn === null){
-            $storage->method('contains')->willReturn(false);
-            $storage->method('fetch')->willReturn(false);
-        } else {
-            $storage->method('contains')->willReturn(true);
-            $storage->method('fetch')->willReturn($jsToReturn);
-        }
-
-        return $storage;
-    }
-
-    /**
-     * @param $storage
-     *
-     * @return string
-     */
-    private function compile($storage)
-    {
-        /** @var EntryPoint|\PHPUnit_Framework_MockObject_MockObject $entryPoint */
-        $entryPoint = $this->getMockBuilder(EntryPoint::class)->disableOriginalConstructor()->getMock();
-
-        /** @var ConfigurationDefinition|\PHPUnit_Framework_MockObject_MockObject $config */
-        $config = $this->getMockBuilder(ConfigurationDefinition::class)->disableOriginalConstructor()->getMock();
-
-        return (new Webpack($storage))->compile($entryPoint, $config);
     }
 }

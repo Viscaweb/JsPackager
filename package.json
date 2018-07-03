@@ -1,8 +1,19 @@
 {
-    "name": "life-js-packager",
-    "dependencies": {
-        "webpack": "^2.3.1",
-        "webpack2-polyfill-plugin": "0.0.2"
-    },
-    "license": "UNLICENSED"
+  "name": "jspackager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "imports-loader": "^0.7.1",
+    "webpack-dev-server": "^2.8.2",
+    "webpack2-polyfill-plugin": "^0.0.2"
+  },
+  "devDependencies": {
+    "webpack": "^2.7.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
 }
