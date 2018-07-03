@@ -15,21 +15,18 @@ class AliasAssetResource implements AssetResource
         $this->alias = $alias;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getUrl()
+    public function getUrl(): string
     {
-        // TODO: Implement getUrl() method.
+        return '';
     }
 
-    public function getPath()
+    public function getPath(): string
     {
         return json_encode($this->alias);
     }
 
-    public function getContent()
+    public function getContent(): string
     {
-        // TODO: Implement getContent() method.
+        return '';
     }
 }
