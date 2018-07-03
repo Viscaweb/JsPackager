@@ -8,7 +8,7 @@ use Visca\JsPackager\Configuration\EntryPoint;
 use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\RequireJS\RequireJSLoader;
 use Visca\JsPackager\Resource\FileAssetResource;
-use Visca\JsPackager\Resource\StringAssetResource;
+use Visca\JsPackager\Resource\FileOnDemandAssetResource;
 use Visca\JsPackager\Compiler\Url\UrlProcessor;
 
 class RequireJsTest extends \PHPUnit_Framework_TestCase
@@ -50,7 +50,7 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
     public function testEntryPoint()
     {
         $id = 'xxx';
-        $resource = new StringAssetResource($id, 'console.log(\'hello\');', $this->tempPath.'/hello.js');
+        $resource = new FileOnDemandAssetResource($id, 'console.log(\'hello\');', $this->tempPath.'/hello.js');
         $entryPoint = new EntryPoint($id, $resource);
 
         $config = clone $this->config;
@@ -81,7 +81,7 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
         $id = 'xxx';
         $entryPoint = $entryPoint ?: new EntryPoint(
             $id,
-            new StringAssetResource($id, '', $this->tempPath.'/xxx.js'));
+            new FileOnDemandAssetResource($id, '', $this->tempPath.'/xxx.js'));
 
         $rootPath = \dirname(__DIR__, 2);
         $expectedJs = file_get_contents($rootPath. '/Tests/fixtures/requirejs/' . $expectedJsFile);

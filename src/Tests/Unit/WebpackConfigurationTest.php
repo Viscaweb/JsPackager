@@ -7,7 +7,7 @@ use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\EntryPoint;
 use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\Resource\FileAssetResource;
-use Visca\JsPackager\Resource\StringAssetResource;
+use Visca\JsPackager\Resource\FileOnDemandAssetResource;
 use Visca\JsPackager\TemplateEngine\MustacheEngine;
 use Visca\JsPackager\TemplateEngine\TemplateEngine;
 use Visca\JsPackager\Webpack\WebpackConfigBuilder;
@@ -162,7 +162,7 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         $id = 'matchPage';
         $entryPoint = new EntryPoint(
             $id,
-            new StringAssetResource($id,'console.log(\'hello\');', $this->tempPath.'/hello.js')
+            new FileOnDemandAssetResource($id,'console.log(\'hello\');', $this->tempPath.'/hello.js')
         );
 
         $this->config->addEntryPoint($entryPoint);
