@@ -108,6 +108,6 @@ class RequireJSLoader implements JavascriptLoader
     private function convertPathToURL($path, ConfigurationDefinition $config)
     {
 //        return '/'.str_replace($config->getWorkingPath().$config->getOutputPublicPath(), '', $path);
-        return $path;
+        return '/'.ltrim($path, '/');
     }
 }
