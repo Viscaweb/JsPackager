@@ -32,6 +32,9 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $fixturesPath;
 
+    /** @var string */
+    protected $tempPath;
+
     public function setUp()
     {
         parent::setUp();
@@ -42,7 +45,7 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->fixturesPath = \dirname($path, 2).'/Tests/fixtures/webpack2';
         $this->resourcesPath = \dirname($path, 2).'/resources';
         $this->workingPath = \dirname($path, 2);
-        $tempPath = \dirname($path, 2).'/var/tmp';
+        $this->tempPath = \dirname($path, 3).'/var/tmp';
 
         $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
         $this->config->setOutputPublicPath('');
@@ -52,7 +55,7 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
             $this->engine,
 //            '/web',
             realpath($this->resourcesPath.'/webpack.config.v2.mustache'),
-            $tempPath
+            $this->tempPath
         );
     }
 
@@ -156,9 +159,9 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testEntryPointFromContent()
     {
-        $this->setExpectedException(\RuntimeException::class);
+        //$this->setExpectedException(\RuntimeException::class);
         //$this->expectException(\RuntimeException::class);
-        $entryPoint = new EntryPoint('matchPage', new StringAssetResource('console.log(\'hello\');'));
+        $entryPoint = new EntryPoint('matchPage', new StringAssetResource('console.log(\'hello\');', $this->tempPath.'/hello.js'));
 
         $this->config->addEntryPoint($entryPoint);
 

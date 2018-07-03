@@ -49,7 +49,7 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
 
     public function testEntryPoint()
     {
-        $resource = new StringAssetResource('console.log(\'hello\');');
+        $resource = new StringAssetResource('console.log(\'hello\');', $this->tempPath.'/hello.js');
         $entryPoint = new EntryPoint('xxx', $resource);
 
         $config = clone $this->config;
@@ -77,7 +77,7 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
         ConfigurationDefinition $config,
         EntryPoint $entryPoint = null
     ) {
-        $entryPoint = $entryPoint ?: new EntryPoint('xxx', new StringAssetResource(''));
+        $entryPoint = $entryPoint ?: new EntryPoint('xxx', new StringAssetResource('', $this->tempPath.'/xxx.js'));
 
         $rootPath = \dirname(__DIR__, 2);
         $expectedJs = file_get_contents($rootPath. '/Tests/fixtures/requirejs/' . $expectedJsFile);
@@ -94,13 +94,19 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
     /** @var UrlProcessor */
     protected $urlProcessor;
 
+    /** @var string */
+    protected $workingPath;
+
+    /** @var string */
+    protected $tempPath;
+
     public function setUp()
     {
         parent::setUp();
 
-//        $this->urlProcessor = new UrlProcessor(new ArrayCache(), '');
-//        $this->urlProcessor->setCacheBustingEnabled(false);
+        $this->workingPath = \dirname(__DIR__, 2);
+        $this->tempPath = \dirname(__DIR__, 3).'/var/tmp';
 
-        $this->config = new ConfigurationDefinition('desktop', 'prod', \dirname(__DIR__, 2));
+        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath);
     }
 }

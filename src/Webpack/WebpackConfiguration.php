@@ -32,21 +32,6 @@ class WebpackConfiguration
     public function __construct(string $outputPath, array $entryPoints, array $aliases, array $plugins = [])
     {
         $this->outputPath = $outputPath;
-
-        $sanitizedEntryPoints = [];
-        /**
-         * @var EntryPoint[] $entryPoints
-         */
-        foreach ($entryPoints as $entryPoint) {
-            if ($entryPoint->getResource() instanceof FileAssetResource === false) {
-                throw new \RuntimeException(
-                    sprintf('Entry point "%s" has resource of type "%s". This is not compatible with Webpack. Use solely FileAssetResource types.',
-                        $entryPoint->getName(),
-                        \get_class($entryPoint->getResource())
-                    )
-                );
-            }
-        }
         $this->entryPoints = $entryPoints;
         $this->aliases = $aliases;
         $this->plugins = $plugins;
