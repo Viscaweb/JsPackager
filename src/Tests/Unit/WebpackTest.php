@@ -43,7 +43,7 @@ class WebpackTest extends \PHPUnit_Framework_TestCase
         $path = __DIR__;
         $this->workingPath = \dirname($path, 3);
         $this->fixturesPath = $this->workingPath.'/src/Tests/fixtures/webpack2';
-        $this->resourcesPath = $this->workingPath.'/src/resources';
+        $this->resourcesPath = $this->workingPath.'/resources';
         $this->tempPath = $this->workingPath.'/var/tmp';
     }
 
