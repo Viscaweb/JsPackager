@@ -2,9 +2,6 @@
 
 namespace Visca\JsPackager\Resource;
 
-/**
- * Class FileAssetResource
- */
 class FileAssetResource implements AssetResource
 {
     /** @var string */

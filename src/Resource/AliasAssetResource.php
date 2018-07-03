@@ -2,9 +2,6 @@
 
 namespace Visca\JsPackager\Resource;
 
-/**
- * Class AliasAssetResource
- */
 class AliasAssetResource implements AssetResource
 {
     /** @var string[] */
