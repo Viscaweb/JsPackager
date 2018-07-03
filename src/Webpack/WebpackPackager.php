@@ -44,7 +44,7 @@ class WebpackPackager implements JavascriptPackager
         FileSystem::cleanDir($config->getBuildOutputPath());
 
         $output = $this->nodeJsShellExecutor->run(
-            $config->getWorkingPath().'/'.self::BINARY_WEBPACK . ' --json --config ' . $webpackConfigFile,
+            self::BINARY_WEBPACK . ' --json --config ' . $webpackConfigFile,
             $config->getWorkingPath()
         );
 
