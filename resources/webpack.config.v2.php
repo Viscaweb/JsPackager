@@ -82,7 +82,9 @@ module.exports = {
     plugins: pluginsConfig
 };";
 
-
-function jsonEncode($data) {
-    return json_encode($data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+if (!function_exists('jsonEncode')) {
+    function jsonEncode($data)
+    {
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
 }
