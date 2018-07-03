@@ -49,8 +49,9 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
 
     public function testEntryPoint()
     {
-        $resource = new StringAssetResource('console.log(\'hello\');', $this->tempPath.'/hello.js');
-        $entryPoint = new EntryPoint('xxx', $resource);
+        $id = 'xxx';
+        $resource = new StringAssetResource($id, 'console.log(\'hello\');', $this->tempPath.'/hello.js');
+        $entryPoint = new EntryPoint($id, $resource);
 
         $config = clone $this->config;
         $config->addEntryPoint($entryPoint);
@@ -77,7 +78,10 @@ class RequireJsTest extends \PHPUnit_Framework_TestCase
         ConfigurationDefinition $config,
         EntryPoint $entryPoint = null
     ) {
-        $entryPoint = $entryPoint ?: new EntryPoint('xxx', new StringAssetResource('', $this->tempPath.'/xxx.js'));
+        $id = 'xxx';
+        $entryPoint = $entryPoint ?: new EntryPoint(
+            $id,
+            new StringAssetResource($id, '', $this->tempPath.'/xxx.js'));
 
         $rootPath = \dirname(__DIR__, 2);
         $expectedJs = file_get_contents($rootPath. '/Tests/fixtures/requirejs/' . $expectedJsFile);

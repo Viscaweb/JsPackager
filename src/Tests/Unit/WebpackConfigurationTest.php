@@ -159,12 +159,15 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testEntryPointFromContent()
     {
-        //$this->setExpectedException(\RuntimeException::class);
-        //$this->expectException(\RuntimeException::class);
-        $entryPoint = new EntryPoint('matchPage', new StringAssetResource('console.log(\'hello\');', $this->tempPath.'/hello.js'));
+        $id = 'matchPage';
+        $entryPoint = new EntryPoint(
+            $id,
+            new StringAssetResource($id,'console.log(\'hello\');', $this->tempPath.'/hello.js')
+        );
 
         $this->config->addEntryPoint($entryPoint);
 
-        $this->webpackConfigBuilder->generateConfigurationFile($this->config);
+        $result = $this->webpackConfigBuilder->generateConfigurationFile($this->config);
+        $this->assertNotEmpty($result);
     }
 }

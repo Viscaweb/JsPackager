@@ -5,6 +5,9 @@ namespace Visca\JsPackager\Resource;
 class StringAssetResource implements AssetResource
 {
     /** @var string */
+    protected $id;
+
+    /** @var string */
     protected $content;
 
     /** @var string */
@@ -13,13 +16,15 @@ class StringAssetResource implements AssetResource
     /**
      * StringAssetResource constructor.
      *
+     * @param string $id
      * @param string $content
      * @param string $temporalPath In case we need the filepath to this resource we need to
      *                             specify what temporal path we want to store this file.
-     *                             specify the full filename too.
+     *                             Do NOT specify the full filename.
      */
-    public function __construct(string $content, string $temporalPath)
+    public function __construct(string $id, string $content, string $temporalPath)
     {
+        $this->id = $id;
         $this->content = $content;
         $this->temporalPath = $temporalPath;
     }
@@ -36,7 +41,7 @@ class StringAssetResource implements AssetResource
             throw new \RuntimeException('Could not save temporal file for StringAssetResource at "'.$this->temporalPath.'"');
         }
 
-        return $this->temporalPath;
+        return $this->temporalPath.'/'.$this->id.'.js';
     }
 
     public function getUrl(): string
