@@ -36,6 +36,10 @@ class FileOnDemandAssetResource implements AssetResource
 
     public function getPath(): string
     {
+        if (!is_dir($this->temporalPath)) {
+            mkdir($this->temporalPath, 0777, true);
+        }
+
         $path = $this->temporalPath.'/'.$this->id.'.js';
         $result = file_put_contents($path, $this->content);
         if ($result === false) {
