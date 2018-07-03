@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Visca\JsPackager\Packager\Report;
+namespace Visca\JsPackager\Report;
 
-class BuildReport implements Report
+class PackageReport
 {
     /** @var string */
     protected $version;

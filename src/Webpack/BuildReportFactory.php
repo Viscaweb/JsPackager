@@ -2,16 +2,15 @@
 
 namespace Visca\JsPackager\Webpack;
 
-use Visca\JsPackager\Packager\Report\BuildReport;
-use Visca\JsPackager\Packager\Report\EntryPoint;
-use Visca\JsPackager\Packager\Report\Report;
+use Visca\JsPackager\Report\EntryPoint;
+use Visca\JsPackager\Report\PackageReport;
 
 class BuildReportFactory
 {
     /**
      * @throws \RuntimeException
      */
-    public static function create(string $webpackOutput): Report
+    public static function create(string $webpackOutput): PackageReport
     {
         // Try to convert output to JSON
         $jsonStats = json_decode($webpackOutput, true);
@@ -67,7 +66,7 @@ class BuildReportFactory
             $errors[] = $jsonStats['errors'][0];
         }
 
-        $report = new BuildReport($assetsBuilt, $commonAssets, $jsonStats['time'], $jsonStats['version'], $errors);
+        $report = new PackageReport($assetsBuilt, $commonAssets, $jsonStats['time'], $jsonStats['version'], $errors);
 
         return $report;
     }

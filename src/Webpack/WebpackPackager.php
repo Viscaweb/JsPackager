@@ -4,7 +4,7 @@ namespace Visca\JsPackager\Webpack;
 
 use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\JavascriptPackager;
-use Visca\JsPackager\Packager\Report\Report;
+use Visca\JsPackager\Report\PackageReport;
 use Visca\JsPackager\Shell\NodeJsShellExecutor;
 use Visca\JsPackager\Utils\FileSystem;
 
@@ -29,7 +29,7 @@ class WebpackPackager implements JavascriptPackager
         return 'webpack';
     }
 
-    public function package(ConfigurationDefinition $configuration)
+    public function package(ConfigurationDefinition $configuration): PackageReport
     {
         $webpackConfigPath = $this->webpackConfigBuilder->generateConfigurationFile($configuration, false);
 
@@ -39,7 +39,7 @@ class WebpackPackager implements JavascriptPackager
     /**
      * @throws \RuntimeException
      */
-    private function runCompilation($webpackConfigFile, ConfigurationDefinition $config): Report
+    private function runCompilation($webpackConfigFile, ConfigurationDefinition $config): PackageReport
     {
         FileSystem::cleanDir($config->getBuildOutputPath());
 
