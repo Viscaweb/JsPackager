@@ -48,6 +48,10 @@ class WebpackPackager implements JavascriptPackager
             $config->getProjectRootPath()
         );
 
+        if (!$output) {
+            throw new \RuntimeException('Webpack spit some kind of error.');
+        }
+
         // Analyze output
         return BuildReportFactory::create($output);
     }

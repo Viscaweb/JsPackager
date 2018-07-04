@@ -12,7 +12,7 @@ use Visca\JsPackager\TemplateEngine\PHPEngine;
 echo "'use strict';\n\n";
 
 foreach ($modules as $module) {
-    echo $module;
+    echo $module."\n";
 }
 
 echo 'const outputConfig = '.PHPEngine::jsonEncode([
@@ -67,7 +67,7 @@ echo "\n";
 echo "const pluginsConfig = [];\n";
 /** @var \Visca\JsPackager\Webpack\Plugins\PluginDescriptorInterface $plugins */
 foreach ($plugins as $plugin) {
-    echo "pluginsConfig.push(new ".$plugin->name()."(".PHPEngine::jsonEncode($plugin->getOptions())."));";
+    echo "pluginsConfig.push(new ".$plugin->name()."(".PHPEngine::jsonEncode($plugin->getOptions())."));\n";
 }
 
 
