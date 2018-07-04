@@ -7,9 +7,6 @@ class ConfigurationDefinition
     /** @var string */
     private $name;
 
-    /** @var string */
-    private $currentEnvironment;
-
     /**
      * @var string Specified the public URL address of the output
      *             files when referenced in a browser.
