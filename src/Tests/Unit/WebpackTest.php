@@ -14,7 +14,7 @@ class WebpackTest extends \PHPUnit_Framework_TestCase
 {
     public function testPackageFileHelloWorld()
     {
-        $config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath, $this->workingPath);
+        $config = new ConfigurationDefinition('desktop', $this->workingPath);
         $config->setBuildOutputPath($this->tempPath);
 
         $path = $this->fixturesPath.'/src/hello.world.js';

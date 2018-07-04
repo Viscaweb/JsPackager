@@ -50,7 +50,7 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->workingPath = \dirname($path, 2);
         $this->tempPath = \dirname($path, 3).'/var/tmp';
 
-        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath, $this->workingPath);
+        $this->config = new ConfigurationDefinition('desktop', $this->workingPath);
         $this->config->setOutputPublicPath('');
         $this->config->setBuildOutputPath('');
 

@@ -113,6 +113,6 @@ class RequireJsLoaderTest extends \PHPUnit_Framework_TestCase
         $this->workingPath = \dirname(__DIR__, 2);
         $this->tempPath = \dirname(__DIR__, 3).'/var/tmp';
 
-        $this->config = new ConfigurationDefinition('desktop', 'prod', $this->workingPath, $this->workingPath);
+        $this->config = new ConfigurationDefinition('desktop', $this->workingPath);
     }
 }

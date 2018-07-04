@@ -22,9 +22,6 @@ class ConfigurationDefinition
      */
     private $projectRootPath;
 
-    /** @var string Path to the folder were the site is served. Usually /<fullpath>/web */
-    private $publicProjectPath;
-
     /** @var string Where to store output files */
     private $buildOutputPath;
 
@@ -49,23 +46,16 @@ class ConfigurationDefinition
     /** @var bool */
     private $minifyEnabled;
 
-    public function __construct(string $name, string $environment, string $projectRootPath, string $publicProjectPath)
+    public function __construct(string $name, string $projectRootPath)
     {
         $this->name = $name;
         $this->minifyEnabled = true;
-        $this->currentEnvironment = $environment;
         $this->projectRootPath = $projectRootPath;
-        $this->publicProjectPath = $publicProjectPath;
     }
 
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getCurrentEnvironment(): string
-    {
-        return $this->currentEnvironment;
     }
 
     public function getOutputPublicPath(): ?string
@@ -210,6 +200,6 @@ class ConfigurationDefinition
 
     public function getPublicProjectPath(): string
     {
-        return $this->publicProjectPath;
+        return \dirname($this->projectRootPath).'/web';
     }
 }
