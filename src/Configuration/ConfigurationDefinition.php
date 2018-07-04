@@ -200,6 +200,6 @@ class ConfigurationDefinition
 
     public function getPublicProjectPath(): string
     {
-        return \dirname($this->projectRootPath).'/web';
+        return $this->projectRootPath.'/web';
     }
 }
