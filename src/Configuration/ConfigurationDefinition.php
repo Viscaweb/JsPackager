@@ -1,10 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Visca\JsPackager\Configuration;
 
-/**
- * Class ConfigurationDefinition
- */
 class ConfigurationDefinition
 {
     /** @var string */
@@ -61,25 +58,16 @@ class ConfigurationDefinition
         $this->publicProjectPath = $publicProjectPath;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrentEnvironment()
+    public function getCurrentEnvironment(): string
     {
         return $this->currentEnvironment;
     }
 
-    /**
-     * @return string
-     */
     public function getOutputPublicPath(): ?string
     {
         if ($this->outputPublicPath === null) {
@@ -94,40 +82,26 @@ class ConfigurationDefinition
      *
      * @return ConfigurationDefinition
      */
-    public function setOutputPublicPath($outputPublicPath): self
+    public function setOutputPublicPath(string $outputPublicPath): self
     {
         $this->outputPublicPath = rtrim($outputPublicPath, '/').'/';
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getBuildOutputPath()
+    public function getBuildOutputPath(): string
     {
         return $this->buildOutputPath;
     }
 
-    /**
-     * @param string $buildOutputPath
-     *
-     * @return ConfigurationDefinition
-     */
-    public function setBuildOutputPath(string $buildOutputPath)
+    public function setBuildOutputPath(string $buildOutputPath): self
     {
         $this->buildOutputPath = $buildOutputPath;
 
         return $this;
     }
 
-    /**
-     * @param       $environment
-     * @param array $domains
-     *
-     * @return $this
-     */
-    public function setDomainsInjection(string $environment, array $domains)
+    public function setDomainsInjection(string $environment, array $domains): self
     {
         $this->domainsInjectionEnvironment = $environment;
         $this->domainsInjection = $domains;
@@ -148,7 +122,7 @@ class ConfigurationDefinition
      *
      * @param EntryPoint $entryPoint
      */
-    public function addEntryPoint(EntryPoint $entryPoint)
+    public function addEntryPoint(EntryPoint $entryPoint): void
     {
         $this->entryPoints[] = $entryPoint;
     }
@@ -161,7 +135,7 @@ class ConfigurationDefinition
         return $this->entryPoints;
     }
 
-    public function addAlias(Alias $alias)
+    public function addAlias(Alias $alias): void
     {
         $this->alias[] = $alias;
     }

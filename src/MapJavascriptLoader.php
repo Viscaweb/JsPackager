@@ -17,6 +17,13 @@ class MapJavascriptLoader implements JavascriptLoader
 
     public function getPageJavascript(EntryPoint $entryPoint, ConfigurationDefinition $configuration): string
     {
-        return $this->map[$entryPoint->getName()] ?? '';
+        $urls = $this->map[$configuration->getName()][$entryPoint->getName()] ?? '';
+
+        $html = '';
+        foreach ($urls as $url) {
+            $html.= '<script src="'.$url.'"></script>';
+        }
+
+        return $html;
     }
 }
