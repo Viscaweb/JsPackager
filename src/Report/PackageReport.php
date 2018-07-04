@@ -44,7 +44,7 @@ class PackageReport
     }
 
     /**
-     * @return null|EntryPoint|EntryPoint[]
+     * @return EntryPoint|EntryPoint[]
      */
     public function getAssets(?string $key = null)
     {
@@ -52,7 +52,7 @@ class PackageReport
             return $this->assets;
         }
 
-        return $this->assets[$key] ?? null;
+        return $this->assets[$key] ?? [];
     }
 
     public function getCommonAssets()

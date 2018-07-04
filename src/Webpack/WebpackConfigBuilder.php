@@ -150,7 +150,7 @@ class WebpackConfigBuilder
      */
     private function getPlugins(ConfigurationDefinition $config, bool $debug = false): array
     {
-        return $this->plugins;
+        //return $this->plugins;
 
         $shimmingModules = $this->getShimsModules($config);
 
