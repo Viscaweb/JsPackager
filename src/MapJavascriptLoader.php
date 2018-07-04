@@ -2,6 +2,7 @@
 
 namespace Visca\JsPackager;
 
+use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\EntryPoint;
 
 class MapJavascriptLoader implements JavascriptLoader
