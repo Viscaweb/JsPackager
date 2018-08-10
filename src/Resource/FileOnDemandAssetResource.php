@@ -36,7 +36,7 @@ class FileOnDemandAssetResource implements AssetResource
 
     public function prependContent(string $content)
     {
-        $this->content = $content.$content;
+        $this->content = $content.$this->content;
     }
 
     public function getPath(): string
