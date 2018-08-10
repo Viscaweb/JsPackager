@@ -42,7 +42,6 @@ class WebpackConfigurationTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $path = __DIR__;
-//        $this->engine = new MustacheEngine(new \Mustache_Engine());
         $this->engine = new PHPEngine();
 
         $this->fixturesPath = \dirname($path, 2).'/Tests/fixtures/webpack2';

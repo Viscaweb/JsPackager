@@ -43,5 +43,6 @@ module.exports = {
     module: {
         loaders: loadersConfig
     },
-    plugins: pluginsConfig
+    plugins: pluginsConfig,
+    devtool: 'source-map'
 };
