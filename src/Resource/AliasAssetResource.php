@@ -27,6 +27,11 @@ class AliasAssetResource implements AssetResource
         return '';
     }
 
+    public function prependContent(string $content)
+    {
+        // Ignore on purpose
+    }
+
     public function getAliases(): array
     {
         return $this->alias;

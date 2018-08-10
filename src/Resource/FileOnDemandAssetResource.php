@@ -34,6 +34,11 @@ class FileOnDemandAssetResource implements AssetResource
         return $this->content;
     }
 
+    public function prependContent(string $content)
+    {
+        $this->content = $content.$content;
+    }
+
     public function getPath(): string
     {
         if (!is_dir($this->temporalPath)) {

@@ -21,6 +21,11 @@ class FileAssetResource implements AssetResource
         return file_get_contents($this->path);
     }
 
+    public function prependContent(string $content)
+    {
+        // Ignore on purpose
+    }
+
     public function getPath(): string
     {
         return $this->path;

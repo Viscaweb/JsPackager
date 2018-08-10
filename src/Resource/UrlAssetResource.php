@@ -20,6 +20,11 @@ class UrlAssetResource implements AssetResource
         return '';
     }
 
+    public function prependContent(string $content)
+    {
+        // Ignore on purpose
+    }
+
     /**
      * {@inheritdoc}
      */
