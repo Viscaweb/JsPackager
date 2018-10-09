@@ -6,8 +6,7 @@ namespace Visca\JsPackager\Webpack;
 
 use Visca\JsPackager\Configuration\Alias;
 use Visca\JsPackager\Configuration\EntryPoint;
-use Visca\JsPackager\Resource\FileAssetResource;
-use Visca\JsPackager\Webpack\Plugins\PluginDescriptorInterface;
+use Visca\JsPackager\Webpack\Configuration\Plugins\PluginDescriptorInterface;
 
 class WebpackConfiguration
 {

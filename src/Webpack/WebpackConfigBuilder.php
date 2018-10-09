@@ -7,21 +7,18 @@ use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\Shim;
 use Visca\JsPackager\TemplateEngine\TemplateEngine;
 use Visca\JsPackager\Utils\FileSystem;
-use Visca\JsPackager\Webpack\Loaders\JsonLoader;
-use Visca\JsPackager\Webpack\Plugins\BundleAnalyzerPlugin;
-use Visca\JsPackager\Webpack\Plugins\CommonsChunkPlugin;
-use Visca\JsPackager\Webpack\Plugins\DuplicatePackageCheckerPlugin;
-use Visca\JsPackager\Webpack\Plugins\GenericPlugin;
-use Visca\JsPackager\Webpack\Plugins\MinChunkSizePlugin;
-use Visca\JsPackager\Webpack\Plugins\PluginDescriptorInterface;
-use Visca\JsPackager\Webpack\Plugins\ProvidePlugin;
-use Visca\JsPackager\Webpack\Plugins\UglifyJsPlugin;
+use Visca\JsPackager\Webpack\Configuration\Loaders\JsonLoader;
+use Visca\JsPackager\Webpack\Configuration\Plugins\BundleAnalyzerPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\CommonsChunkPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\DuplicatePackageCheckerPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\GenericPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\MinChunkSizePlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\PluginDescriptorInterface;
+use Visca\JsPackager\Webpack\Configuration\Plugins\ProvidePlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\UglifyJsPlugin;
 
 class WebpackConfigBuilder
 {
-    /** @var string */
-//    protected $publicDir;
-
     /** @var TemplateEngine */
     protected $engine;
 
@@ -36,7 +33,6 @@ class WebpackConfigBuilder
 
     public function __construct(
         TemplateEngine $engine,
-//        string $publicDir,
         string $templatePath,
         ?string $temporalPath = null,
         array $plugins = []
@@ -44,7 +40,6 @@ class WebpackConfigBuilder
         FileSystem::ensureDirExists($temporalPath);
 
         $this->engine = $engine;
-//        $this->publicDir = $publicDir;
         $this->temporalPath = realpath($temporalPath);
         $this->templatePath = $templatePath;
         $this->plugins = $plugins;
@@ -86,20 +81,6 @@ class WebpackConfigBuilder
                 'modules' => $context->modules()
             ]
         );
-
-        /*
-        $output = $this->engine->render(
-            $this->templatePath,
-            [
-                'jsModules' => $jsModules,
-                'entryPoints' => $config->getEntryPoints(),
-                'outputPath' => $config->getBuildOutputPath(),
-                'publicPath' => $config->getOutputPublicPath(),
-                'alias' => $webpackAlias,
-                'loaders' => $this->getLoaders(),
-                'plugins' => $plugins,
-            ]
-        );*/
 
         $path = $this->temporalPath.'/'.$config->getName();
         FileSystem::ensureDirExists($path);
@@ -158,8 +139,13 @@ class WebpackConfigBuilder
             $plugins[] = new UglifyJsPlugin();
         }
         $plugins[] = new MinChunkSizePlugin();
-        $plugins[] = new DuplicatePackageCheckerPlugin();
+//        $plugins[] = new DuplicatePackageCheckerPlugin();
         $plugins[] = new GenericPlugin('webpack2PolyfillPlugin', 'webpack2-polyfill-plugin');
+        $plugins[] = new GenericPlugin(
+            'webpackStatsPlugin',
+            './../../../../../WebpackStatsPlugin',
+            ['path' => $this->getTemporalPath().'/'.$config->getName()]
+        );
 
         if ($debug) {
             $plugins[] = new BundleAnalyzerPlugin();

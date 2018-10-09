@@ -43,21 +43,24 @@ foreach ($entryPoints as $entry) {
 
 echo "\n";
 echo "const aliasConfig = {};\n";
+$aliasesJson = [];
 foreach ($aliases as $alias) {
     $resource = $alias->getResource();
     switch (true) {
         case ($resource instanceof \Visca\JsPackager\Resource\FileAssetResource):
         case ($resource instanceof \Visca\JsPackager\Resource\FileOnDemandAssetResource):
             /** @var \Visca\JsPackager\Resource\FileAssetResource $resource */
-            $value = '"'.$resource->getPath().'"';
+            $value = $resource->getPath();
             break;
 
         case ($resource instanceof \Visca\JsPackager\Resource\AliasAssetResource):
             /** @var \Visca\JsPackager\Resource\AliasAssetResource $resource */
-            $value = PHPEngine::jsonEncode($resource->getAliases());
+//            $value = PHPEngine::jsonEncode($resource->getAliases());
+            $value = $resource->getAliases();
             break;
     }
-    echo "aliasConfig['".$alias->getName()."'] = ".$value.";\n";
+    $aliasesJson[$alias->getName()] = $value;
+//    echo "aliasConfig['".$alias->getName()."'] = ".$value.";\n";
 }
 
 echo "\n";
@@ -76,11 +79,18 @@ module.exports = {
     entry: entriesConfig,
     output: outputConfig,
     resolve: {
-        alias: aliasConfig
+        alias: ".json_encode($aliasesJson,  JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."
     },
     module: {
         loaders: loadersConfig
     },
     plugins: pluginsConfig,
-    devtool: 'source-map'
+    devtool: 'source-map',
+    devServer: {
+        headers: {
+            \"Access-Control-Allow-Origin\": \"*\",
+            \"Access-Control-Allow-Methods\": \"GET, POST, PUT, DELETE, PATCH, OPTIONS\",
+            \"Access-Control-Allow-Headers\": \"X-Requested-With, content-type, Authorization\"
+        }
+    }
 };";

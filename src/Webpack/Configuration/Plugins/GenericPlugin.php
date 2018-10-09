@@ -1,6 +1,6 @@
 <?php
 
-namespace Visca\JsPackager\Webpack\Plugins;
+namespace Visca\JsPackager\Webpack\Configuration\Plugins;
 
 class GenericPlugin extends AbstractPluginDescriptor
 {
@@ -46,6 +46,16 @@ class GenericPlugin extends AbstractPluginDescriptor
         return $this->options;
     }
 
+    public function getRequireCall()
+    {
+        $moduleName = $this->getModuleName();
+
+        $output = 'var '.
+            $this->name().
+            ' = require(\''.$moduleName.'\');';
+
+        return $output;
+    }
 
 /*
     public function getName()

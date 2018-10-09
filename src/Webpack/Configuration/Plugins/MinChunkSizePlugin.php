@@ -1,6 +1,6 @@
 <?php
 
-namespace Visca\JsPackager\Webpack\Plugins;
+namespace Visca\JsPackager\Webpack\Configuration\Plugins;
 
 class MinChunkSizePlugin extends AbstractPluginDescriptor
 {

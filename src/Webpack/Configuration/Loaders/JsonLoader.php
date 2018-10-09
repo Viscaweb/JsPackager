@@ -1,6 +1,6 @@
 <?php
 
-namespace Visca\JsPackager\Webpack\Loaders;
+namespace Visca\JsPackager\Webpack\Configuration\Loaders;
 
 class JsonLoader implements WebpackLoaderInterface
 {
