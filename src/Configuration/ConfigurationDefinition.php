@@ -65,18 +65,6 @@ class ConfigurationDefinition
         return rtrim($this->outputPublicPath, '/').'/';
     }
 
-    /**
-     * @param string $outputPublicPath
-     *
-     * @return ConfigurationDefinition
-     */
-    public function setOutputPublicPath(string $outputPublicPath): self
-    {
-        $this->outputPublicPath = rtrim($outputPublicPath, '/').'/';
-
-        return $this;
-    }
-
     public function getBuildOutputPath(): string
     {
         return $this->buildOutputPath;

@@ -18,10 +18,14 @@ class WebpackPackager implements JavascriptPackager
     /** @var NodeJsShellExecutor */
     private $nodeJsShellExecutor;
 
-    public function __construct(WebpackConfigBuilder $webpackConfig, NodeJsShellExecutor $nodeJsShellExecutor)
+    /** @var string */
+    private $tmpPath;
+
+    public function __construct(WebpackConfigBuilder $webpackConfig, NodeJsShellExecutor $nodeJsShellExecutor, string $tmpPath)
     {
         $this->webpackConfigBuilder = $webpackConfig;
         $this->nodeJsShellExecutor = $nodeJsShellExecutor;
+        $this->tmpPath = $tmpPath;
     }
 
     public function getName(): string
@@ -31,7 +35,8 @@ class WebpackPackager implements JavascriptPackager
 
     public function package(ConfigurationDefinition $configuration): PackageReport
     {
-        $webpackConfigPath = $this->webpackConfigBuilder->generateConfigurationFile($configuration, false);
+        $path = $this->tmpPath . '/'.$configuration->getName();
+        $webpackConfigPath = $this->webpackConfigBuilder->generateConfigurationFile($configuration, $path);
 
         return $this->runCompilation($webpackConfigPath, $configuration);
     }

@@ -22,25 +22,20 @@ class WebpackConfigBuilder
     /** @var string */
     private $webpackConfigFilePath;
 
-    /** @var string */
-    protected $temporalPath;
-
     /** @var PluginDescriptorInterface[] */
     protected $plugins;
 
     public function __construct(
         string $webpackConfigFilePath,
-        string $temporalPath,
         array $plugins = []
     ) {
-        FileSystem::ensureDirExists($temporalPath);
         $this->webpackConfigFilePath = $webpackConfigFilePath;
-        $this->temporalPath = realpath($temporalPath);
         $this->plugins = $plugins;
     }
 
     public function generateConfigurationFile(ConfigurationDefinition $config, string $path): string
     {
+        FileSystem::ensureDirExists($path);
         $this->generateEntryPointsFile($config, $path);
         $this->generateResolveAliasesFile($config, $path);
 
@@ -58,7 +53,7 @@ class WebpackConfigBuilder
     {
         $webpackConfig = str_replace(
             ['%output.publicPath%', '%output.path%'],
-            [$config->getOutputPublicPath(), '/'],
+            [$config->getOutputPublicPath(), $config->getBuildOutputPath()],
             $webpackConfig
         );
 
@@ -91,7 +86,7 @@ class WebpackConfigBuilder
 
         $output = 'module.exports = '.json_encode($array, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES).';';
 
-        $filename = $this->getNamespacedFilename($config, 'alias.js');
+        $filename = $this->getNamespacedFilename($config, 'aliases.js');
         file_put_contents($path.'/'.$filename, $output);
     }
 
