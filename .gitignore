@@ -2,3 +2,5 @@ src/Resources/temp
 src/Resources/tmp
 var
 vendor
+.idea
+Tests/temp

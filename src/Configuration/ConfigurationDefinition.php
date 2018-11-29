@@ -43,11 +43,12 @@ class ConfigurationDefinition
     /** @var bool */
     private $minifyEnabled;
 
-    public function __construct(string $name, string $projectRootPath)
+    public function __construct(string $name, string $projectRootPath, string $buildOutputPath)
     {
         $this->name = $name;
         $this->minifyEnabled = true;
         $this->projectRootPath = $projectRootPath;
+        $this->buildOutputPath = $buildOutputPath;
     }
 
     public function getName(): string

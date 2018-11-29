@@ -7,6 +7,7 @@
   "prefer-stable": true,
   "require": {
     "php": ">=7.1",
+    "ext-json": "*",
     "mustache/mustache": "^2.12"
   },
   "autoload": {
@@ -20,6 +21,6 @@
     }
   },
   "require-dev": {
-    "phpunit/phpunit": "5.*"
+    "phpunit/phpunit": "^7.4"
   }
 }

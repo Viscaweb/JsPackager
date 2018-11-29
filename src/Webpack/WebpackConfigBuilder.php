@@ -19,11 +19,8 @@ use Visca\JsPackager\Webpack\Configuration\Plugins\UglifyJsPlugin;
 
 class WebpackConfigBuilder
 {
-    /** @var TemplateEngine */
-    protected $engine;
-
     /** @var string */
-    protected $templatePath;
+    private $webpackConfigFilePath;
 
     /** @var string */
     protected $temporalPath;
@@ -32,80 +29,75 @@ class WebpackConfigBuilder
     protected $plugins;
 
     public function __construct(
-        TemplateEngine $engine,
-        string $templatePath,
-        ?string $temporalPath = null,
+        string $webpackConfigFilePath,
+        string $temporalPath,
         array $plugins = []
     ) {
         FileSystem::ensureDirExists($temporalPath);
-
-        $this->engine = $engine;
+        $this->webpackConfigFilePath = $webpackConfigFilePath;
         $this->temporalPath = realpath($temporalPath);
-        $this->templatePath = $templatePath;
         $this->plugins = $plugins;
     }
 
-    /**
-     * @param ConfigurationDefinition $config Configuration file.
-     * @param bool                    $debug  Enables some debugging info in the output.
-     *
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function generateConfigurationFile(ConfigurationDefinition $config, bool $debug = false)
+    public function generateConfigurationFile(ConfigurationDefinition $config, string $path): string
     {
-        $aliases = $config->getAlias();
+        $this->generateEntryPointsFile($config, $path);
+        $this->generateResolveAliasesFile($config, $path);
 
-        //$webpackAlias = $this->getWebpackAliases($aliases);
-        //$shimmingModules = $this->getShimsModules($aliases);
-        $plugins = $this->getPlugins($config, $debug);
-        //$jsModules = $this->getJsModules($plugins);
+        $webpackConfigPath = $path.'/'.$this->getNamespacedFilename($config, 'webpack.config.js');
 
-        $context = new WebpackConfiguration(
-            $config->getBuildOutputPath(),
-            $config->getEntryPoints(),
-            $config->getAlias(),
-            $plugins
-        );
+        $webpackConfig = file_get_contents($this->webpackConfigFilePath);
+        $webpackConfig = $this->generateOutputConfiguration($config, $webpackConfig);
 
-        $context->setOutputPublicPath($config->getOutputPublicPath());
+        file_put_contents($webpackConfigPath, $webpackConfig);
 
-        $output = $this->engine->render(
-            $this->templatePath,
-            [
-                'outputPath' => $context->outputPath(),
-                'outputPublicPath' => $context->outputPublicPath(),
-                'entryPoints' => $context->entryPoints(),
-                'aliases' => $context->aliases(),
-                'plugins' => $context->plugins(),
-                'modules' => $context->modules()
-            ]
-        );
-
-        $path = $this->temporalPath.'/'.$config->getName();
-        FileSystem::ensureDirExists($path);
-        FileSystem::saveContent(
-            $configFileLocation = $path.'/webpack.config.'.$config->getName().'.js',
-            $output
-        );
-
-        return $configFileLocation;
+        return $webpackConfigPath;
     }
 
-    public function getTemporalPath(): string
+    private function generateOutputConfiguration(ConfigurationDefinition $config, string $webpackConfig): string
     {
-        return $this->temporalPath;
+        $webpackConfig = str_replace(
+            ['%output.publicPath%', '%output.path%'],
+            [$config->getOutputPublicPath(), '/'],
+            $webpackConfig
+        );
+
+        return $webpackConfig;
     }
 
     /**
-     * @return array
+     * Generates a entry-point-<app>.js file with the content of all existing
+     * entry-point files. This file will be referenced in webpack.config.js file.
      */
-    private function getLoaders()
+    private function generateEntryPointsFile(ConfigurationDefinition $config, string $path)
     {
-        $loaders = [];
-        $loaders[] = new JsonLoader();
+        $array = [];
+        foreach ($config->getEntryPoints() as $entryPoint) {
+            $array[$entryPoint->getName()] = $entryPoint->getResource()->getPath();
+        }
 
-        return $loaders;
+        $output = 'module.exports = ' . json_encode($array,  JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES).';';
+
+        $filename = $this->getNamespacedFilename($config, 'entry-points.js');
+        file_put_contents($path.'/'.$filename, $output);
+    }
+
+    private function generateResolveAliasesFile(ConfigurationDefinition $config, string $path)
+    {
+        $array = [];
+        foreach ($config->getAlias() as $alias) {
+            $array[$alias->getName()] = $alias->getResource()->getPath();
+        }
+
+        $output = 'module.exports = '.json_encode($array, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES).';';
+
+        $filename = $this->getNamespacedFilename($config, 'alias.js');
+        file_put_contents($path.'/'.$filename, $output);
+    }
+
+    private function getNamespacedFilename(ConfigurationDefinition $config, string $filename): string
+    {
+        return /*$config->getName().'/'.*/$filename;
     }
 
     /**
@@ -156,21 +148,6 @@ class WebpackConfigBuilder
         }
 
         return $plugins;
-    }
-
-    /**
-     * @param Alias[] $aliases
-     */
-    private function getWebpackAliases(array $aliases): array
-    {
-        $webpackAlias = [];
-
-        foreach ($aliases as $alias) {
-            $resource = $alias->getResource();
-            $webpackAlias[$alias->getName()] = $resource->getPath();
-        }
-
-        return $webpackAlias;
     }
 
     /**

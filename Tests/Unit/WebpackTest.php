@@ -2,15 +2,15 @@
 
 namespace Visca\JsPackager\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\EntryPoint;
 use Visca\JsPackager\Resource\FileAssetResource;
 use Visca\JsPackager\Shell\NodeJsShellExecutor;
-use Visca\JsPackager\TemplateEngine\MustacheEngine;
 use Visca\JsPackager\Webpack\WebpackConfigBuilder;
 use Visca\JsPackager\Webpack\WebpackPackager;
 
-class WebpackTest extends \PHPUnit_Framework_TestCase
+class WebpackTest extends TestCase
 {
     public function testPackageFileHelloWorld()
     {
@@ -64,15 +64,7 @@ class WebpackTest extends \PHPUnit_Framework_TestCase
 
     private function webpackBuilder(ConfigurationDefinition $config)
     {
-        $path = __DIR__;
-        $engine = new MustacheEngine(new \Mustache_Engine());
-/*
-        $config = new ConfigurationDefinition('desktop', 'prod', \dirname($path, 2));
-        $config->setOutputPublicPath('');
-        $config->setBuildOutputPath('');
-*/
         return new WebpackConfigBuilder(
-            $engine,
 //            '/web',
             $this->resourcesPath.'/webpack.config.v2.mustache',
             $this->tempPath
