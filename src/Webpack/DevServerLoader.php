@@ -74,6 +74,6 @@ class DevServerLoader implements JavascriptLoader
 
     private function buildUrl(string $filename)
     {
-        return '<script src="'.$this->serverUrl.'/'.ltrim($filename, '/').'"></script>';
+        return '<script src="'.ltrim($filename, '/').'"></script>';
     }
 }
