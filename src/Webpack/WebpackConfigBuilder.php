@@ -44,18 +44,27 @@ class WebpackConfigBuilder
         $webpackConfigPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.js');
 
         $webpackConfig = file_get_contents($this->webpackConfigFilePath);
-        $webpackConfig = $this->generateOutputConfiguration($config, $webpackConfig);
+        $webpackConfigProd = $this->generateOutputConfiguration($config, $webpackConfig);
 
-        file_put_contents($webpackConfigPath, $webpackConfig);
+        // Generate prod configuration file
+        file_put_contents($webpackConfigPath, $webpackConfigProd);
+
+        // Generate dev configuration file
+        $webpackConfigDev = $this->generateOutputConfiguration($config, $webpackConfig, true);
+        $webpackConfigPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.dev.js');
+        file_put_contents($webpackConfigPath, $webpackConfigDev);
 
         return $webpackConfigPath;
     }
 
-    private function generateOutputConfiguration(ConfigurationDefinition $config, string $webpackConfig): string
+    private function generateOutputConfiguration(ConfigurationDefinition $config, string $webpackConfig, bool $dev = false): string
     {
+        $outputPublicPath = $dev ? 'http://localhost:8082' : '';
+        $outputPublicPath.= $config->getOutputPublicPath();
+
         $webpackConfig = str_replace(
             ['%output.publicPath%', '%output.path%'],
-            [$config->getOutputPublicPath(), $config->getBuildOutputPath()],
+            [$outputPublicPath, $config->getBuildOutputPath()],
             $webpackConfig
         );
 
