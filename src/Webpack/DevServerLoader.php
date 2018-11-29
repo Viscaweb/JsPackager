@@ -29,7 +29,6 @@ class DevServerLoader implements JavascriptLoader
         $this->serverUrl = $serverUrl;
     }
 
-
     public function getPageJavascript(EntryPoint $entryPoint, ConfigurationDefinition $configuration): string
     {
         $filenames = $this->getEntryPointAssets($entryPoint, $configuration->getName());
@@ -37,36 +36,39 @@ class DevServerLoader implements JavascriptLoader
         return implode('', array_map([$this, 'buildUrl'], $filenames));
     }
 
-    private function getEntryPointAssets(EntryPoint $entryPoint, $context): array
+    private function getEntryPointAssets(EntryPoint $entryPoint, string $context): array
     {
-        $path = $this->mapFilePath.'/'.$context.'/webpack.stats.json';
-        if (!file_exists($path)) {
-            throw new \RuntimeException('no webpack build stats file was found: "'.$path.'". Be sure you started up webpack-dev-server');
+        if (!file_exists($this->mapFilePath)) {
+            throw new \RuntimeException('no webpack build stats file was found: "'.$this->mapFilePath.'". Be sure you started up webpack-dev-server');
         }
 
-        $stats = json_decode(file_get_contents($path), true);
+        $map = json_decode(file_get_contents($this->mapFilePath), true);
 
-        if (!isset($stats['entrypoints'])) {
-            throw new \RuntimeException('did not find key `entrypoints` in '.$path);
+        if (!isset($map[$context])) {
+            throw new \RuntimeException('did not find key `'.$context.'` in '.$this->mapFilePath);
         }
 
-        if (!isset($stats['entrypoints'][$entryPoint->getName()])) {
+        $contextMap = $map[$context];
+
+        if (!isset($contextMap[$entryPoint->getName()])) {
             throw new \RuntimeException(sprintf(
-                'did not find key `entrypoints.%s` in %s',
+                'did not find key `%s.%s` in %s',
+                $context,
                 $entryPoint->getName(),
-                $path
+                $this->mapFilePath
             ));
         }
 
-        $assets = $stats['entrypoints'][$entryPoint->getName()]['assets'];
+        $assets = $contextMap[$entryPoint->getName()];
         $assets = array_filter($assets, function ($path) {
             return preg_match('/\.js$/', $path);
         });
 
-        $assets = array_map(function ($path) use ($stats) {
-            return $stats['publicPath'] . $path;
+/*
+        $assets = array_map(function ($path) use ($map) {
+            return $map['publicPath'] . $path;
         }, $assets);
-
+*/
         return $assets;
     }
 
