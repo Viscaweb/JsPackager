@@ -5,6 +5,7 @@ namespace Visca\JsPackager\Webpack;
 use Visca\JsPackager\Configuration\Alias;
 use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\Shim;
+use Visca\JsPackager\Resource\AliasAssetResource;
 use Visca\JsPackager\TemplateEngine\TemplateEngine;
 use Visca\JsPackager\Utils\FileSystem;
 use Visca\JsPackager\Webpack\Configuration\Loaders\JsonLoader;
@@ -28,7 +29,8 @@ class WebpackConfigBuilder
     public function __construct(
         string $webpackConfigFilePath,
         array $plugins = []
-    ) {
+    )
+    {
         $this->webpackConfigFilePath = $webpackConfigFilePath;
         $this->plugins = $plugins;
     }
@@ -39,7 +41,7 @@ class WebpackConfigBuilder
         $this->generateEntryPointsFile($config, $path);
         $this->generateResolveAliasesFile($config, $path);
 
-        $webpackConfigPath = $path.'/'.$this->getNamespacedFilename($config, 'webpack.config.js');
+        $webpackConfigPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.js');
 
         $webpackConfig = file_get_contents($this->webpackConfigFilePath);
         $webpackConfig = $this->generateOutputConfiguration($config, $webpackConfig);
@@ -68,13 +70,18 @@ class WebpackConfigBuilder
     {
         $array = [];
         foreach ($config->getEntryPoints() as $entryPoint) {
-            $array[$entryPoint->getName()] = $entryPoint->getResource()->getPath();
+            $resource = $entryPoint->getResource();
+            if ($resource instanceof AliasAssetResource) {
+                $array[$entryPoint->getName()] = $resource->getAliases();
+            } else {
+                $array[$entryPoint->getName()] = $entryPoint->getResource()->getPath();
+            }
         }
 
-        $output = 'module.exports = ' . json_encode($array,  JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES).';';
+        $output = 'module.exports = ' . json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . ';';
 
         $filename = $this->getNamespacedFilename($config, 'entry-points.js');
-        file_put_contents($path.'/'.$filename, $output);
+        file_put_contents($path . '/' . $filename, $output);
     }
 
     private function generateResolveAliasesFile(ConfigurationDefinition $config, string $path)
@@ -84,15 +91,16 @@ class WebpackConfigBuilder
             $array[$alias->getName()] = $alias->getResource()->getPath();
         }
 
-        $output = 'module.exports = '.json_encode($array, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES).';';
+        $output = 'module.exports = ' . json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . ';';
 
         $filename = $this->getNamespacedFilename($config, 'aliases.js');
-        file_put_contents($path.'/'.$filename, $output);
+        file_put_contents($path . '/' . $filename, $output);
     }
 
     private function getNamespacedFilename(ConfigurationDefinition $config, string $filename): string
     {
-        return /*$config->getName().'/'.*/$filename;
+        return /*$config->getName().'/'.*/
+            $filename;
     }
 
     /**
@@ -131,7 +139,7 @@ class WebpackConfigBuilder
         $plugins[] = new GenericPlugin(
             'webpackStatsPlugin',
             './../../../../../WebpackStatsPlugin',
-            ['path' => $this->getTemporalPath().'/'.$config->getName()]
+            ['path' => $this->getTemporalPath() . '/' . $config->getName()]
         );
 
         if ($debug) {
