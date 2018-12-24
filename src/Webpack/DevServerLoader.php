@@ -59,10 +59,15 @@ class DevServerLoader implements JavascriptLoader
             ));
         }
 
+        $serverUrl = $this->serverUrl;
         $assets = $contextMap[$entryPoint->getName()];
         $assets = array_filter($assets, function ($path) {
             return preg_match('/\.js$/', $path);
         });
+
+        $assets = array_map(function ($path) use ($serverUrl) {
+            return $serverUrl .$path;
+        }, $assets);
 
 /*
         $assets = array_map(function ($path) use ($map) {
