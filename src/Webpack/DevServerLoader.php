@@ -69,11 +69,6 @@ class DevServerLoader implements JavascriptLoader
             return $serverUrl .$path;
         }, $assets);
 
-/*
-        $assets = array_map(function ($path) use ($map) {
-            return $map['publicPath'] . $path;
-        }, $assets);
-*/
         return $assets;
     }
 

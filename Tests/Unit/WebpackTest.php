@@ -8,7 +8,7 @@ use Visca\JsPackager\Configuration\EntryPoint;
 use Visca\JsPackager\Resource\FileAssetResource;
 use Visca\JsPackager\Shell\NodeJsShellExecutor;
 use Visca\JsPackager\Webpack\WebpackConfigBuilder;
-use Visca\JsPackager\Webpack\WebpackPackager;
+use Visca\JsPackager\Webpack\WebpackBundler;
 
 class WebpackTest extends TestCase
 {
@@ -56,10 +56,10 @@ class WebpackTest extends TestCase
         $nodeShellExecuter = new NodeJsShellExecutor('/usr/local/bin/node', $nodeModulesPath);
         $webpackBuilder = $this->webpackBuilder($config);
 
-        return (new WebpackPackager(
+        return (new WebpackBundler(
             $webpackBuilder,
             $nodeShellExecuter
-        ))->package($config);
+        ))->bundle($config);
     }
 
     private function webpackBuilder(ConfigurationDefinition $config)

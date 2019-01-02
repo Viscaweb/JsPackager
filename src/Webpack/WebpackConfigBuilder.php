@@ -26,13 +26,14 @@ class WebpackConfigBuilder
     /** @var PluginDescriptorInterface[] */
     protected $plugins;
 
-    public function __construct(
-        string $webpackConfigFilePath,
-        array $plugins = []
-    )
+    /** @var bool */
+    protected $developmentMode;
+
+    public function __construct(string $webpackConfigFilePath, array $plugins = [], bool $developmentMode = false)
     {
         $this->webpackConfigFilePath = $webpackConfigFilePath;
         $this->plugins = $plugins;
+        $this->developmentMode = $developmentMode;
     }
 
     public function generateConfigurationFile(ConfigurationDefinition $config, string $path): string
@@ -44,15 +45,15 @@ class WebpackConfigBuilder
         $webpackConfigPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.js');
 
         $webpackConfig = file_get_contents($this->webpackConfigFilePath);
-        $webpackConfigProd = $this->generateOutputConfiguration($config, $webpackConfig);
+        $webpackConfigProd = $this->generateOutputConfiguration($config, $webpackConfig, false);
 
         // Generate prod configuration file
         file_put_contents($webpackConfigPath, $webpackConfigProd);
 
         // Generate dev configuration file
         $webpackConfigDev = $this->generateOutputConfiguration($config, $webpackConfig, true);
-        $webpackConfigPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.dev.js');
-        file_put_contents($webpackConfigPath, $webpackConfigDev);
+        $webpackConfigDevPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.dev.js');
+        file_put_contents($webpackConfigDevPath, $webpackConfigDev);
 
         return $webpackConfigPath;
     }

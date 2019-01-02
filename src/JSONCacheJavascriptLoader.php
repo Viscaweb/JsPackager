@@ -16,7 +16,7 @@ use Visca\JsPackager\Configuration\EntryPoint;
  * That page_scripts.json file is generated with `app/console visca:jspackager-compress`
  * console command.
  */
-class MapJavascriptLoader implements JavascriptLoader
+class JSONCacheJavascriptLoader implements JavascriptLoader
 {
     /** @var array */
     private $map;

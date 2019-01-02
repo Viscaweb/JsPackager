@@ -3,14 +3,14 @@
 namespace Visca\JsPackager\Webpack;
 
 use Visca\JsPackager\Report\EntryPoint;
-use Visca\JsPackager\Report\PackageReport;
+use Visca\JsPackager\Report\BundleReport;
 
 class BuildReportFactory
 {
     /**
      * @throws \RuntimeException
      */
-    public static function create(string $webpackOutput): PackageReport
+    public static function create(string $webpackOutput): BundleReport
     {
         // Try to convert output to JSON
         $jsonStats = json_decode($webpackOutput, true);
@@ -66,7 +66,7 @@ class BuildReportFactory
             $errors[] = $jsonStats['errors'][0];
         }
 
-        $report = new PackageReport($assetsBuilt, $commonAssets, $jsonStats['time'], $jsonStats['version'], $errors);
+        $report = new BundleReport($assetsBuilt, $commonAssets, $jsonStats['time'], $jsonStats['version'], $errors);
 
         return $report;
     }
