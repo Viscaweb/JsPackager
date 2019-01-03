@@ -39,26 +39,17 @@ class BuildReportFactory
         }
         ksort($commonAssets);
 
+        if (!isset($jsonStats['entrypoints'])) {
+            throw new \RuntimeException('No entrypoints found.');
+        }
+
         $assetsBuilt = [];
-        if (isset($jsonStats['assetsByChunkName'])) {
-            foreach ($jsonStats['assetsByChunkName'] as $name => $asset) {
-                $path = '';
-                if (\is_string($asset)) {
-                    $path = $asset;
-                } elseif (\is_array($asset)) {
-                    // We may have generated source-maps, paths are grouped.
-                    $path = $asset[0];
-                }
+        foreach ($jsonStats['entrypoints'] as $name => $data) {
+            $filenames = array_map(function ($filename) use ($jsonStats) {
+                return $jsonStats['publicPath'].$filename;
+            }, $data['assets']);
 
-                $urls = [];
-                foreach ($commonAssets as $commonAsset) {
-                    $urls[] = $commonAsset;
-                }
-                $urls[] = $jsonStats['publicPath'].$path;
-
-
-                $assetsBuilt[$name] = new EntryPoint($name, $urls);
-            }
+            $assetsBuilt[$name] = new EntryPoint($name, $filenames);
         }
 
         $errors = [];

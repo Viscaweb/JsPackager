@@ -109,8 +109,7 @@ class WebpackConfigBuilder
 
     private function getNamespacedFilename(ConfigurationDefinition $config, string $filename): string
     {
-        return /*$config->getName().'/'.*/
-            $filename;
+        return $filename;
     }
 
     /**

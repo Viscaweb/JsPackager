@@ -16,10 +16,15 @@ class EntryPoint
     /** @var UrlAssetResource[] */
     protected $externalResources;
 
+    public static function createFromResource(string $name, AssetResource $resource, array $externalResources = [])
+    {
+        return new self($name, $resource, $externalResources);
+    }
+
     /**
      * EntryPoint constructor.
      *
-     * @param string             $name
+     * @param string $name
      * @param AssetResource      $resource
      * @param UrlAssetResource[] $externalResources Scripts that will be loaded in addition to the AssetResource. Mainly
      *                                              used to include scripts that are required to be included with extra
