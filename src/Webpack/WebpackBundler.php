@@ -49,7 +49,7 @@ class WebpackBundler implements JavascriptBundler
         FileSystem::cleanDir($config->getBuildOutputPath());
 
         $output = $this->nodeJsShellExecutor->run(
-            self::BINARY_WEBPACK . ' --json --config ' . $webpackConfigFile,
+            self::BINARY_WEBPACK . ' -d --json --config ' . $webpackConfigFile,
             $config->getProjectRootPath()
         );
 
