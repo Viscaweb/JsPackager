@@ -32,6 +32,9 @@ class BuildReportFactory
             $asset = $jsonStats['assetsByChunkName'][$key];
             if (\is_array($asset)) {
                 // We may have generated source-maps, webpack groups them by filename.
+                if (self::isMapFile($asset[0])) {
+                    continue;
+                }
                 $asset = $asset[0];
             }
 
@@ -49,7 +52,12 @@ class BuildReportFactory
                 return $jsonStats['publicPath'].$filename;
             }, $data['assets']);
 
-            $assetsBuilt[$name] = new EntryPoint($name, $filenames);
+
+            $filenames = array_filter($filenames, function ($filename) {
+                return !self::isMapFile($filename);
+            });
+
+            $assetsBuilt[$name] = new EntryPoint($name, array_values($filenames));
         }
 
         $errors = [];
@@ -60,5 +68,16 @@ class BuildReportFactory
         $report = new BundleReport($assetsBuilt, $commonAssets, $jsonStats['time'], $jsonStats['version'], $errors);
 
         return $report;
+    }
+
+    private static function isMapFile($asset)
+    {
+        $needle = '.js.map';
+        $length = strlen($needle);
+        if ($length == 0) {
+            return true;
+        }
+
+        return (substr($asset, -$length) === $needle);
     }
 }

@@ -21,11 +21,15 @@ class WebpackBundler implements JavascriptBundler
     /** @var string */
     private $tmpPath;
 
-    public function __construct(WebpackConfigBuilder $webpackConfig, NodeJsShellExecutor $nodeJsShellExecutor, string $tmpPath)
+    /** @var bool */
+    private $devMode;
+
+    public function __construct(WebpackConfigBuilder $webpackConfig, NodeJsShellExecutor $nodeJsShellExecutor, string $tmpPath, bool $devMode = true)
     {
         $this->webpackConfigBuilder = $webpackConfig;
         $this->nodeJsShellExecutor = $nodeJsShellExecutor;
         $this->tmpPath = $tmpPath;
+        $this->devMode = $devMode;
     }
 
     public function getName(): string
@@ -48,8 +52,10 @@ class WebpackBundler implements JavascriptBundler
     {
         FileSystem::cleanDir($config->getBuildOutputPath());
 
+        $mode = $this->devMode ? '-d' : '-p';
+
         $output = $this->nodeJsShellExecutor->run(
-            self::BINARY_WEBPACK . ' -d --json --config ' . $webpackConfigFile,
+            self::BINARY_WEBPACK . ' ' . $mode .' --json --config ' . $webpackConfigFile,
             $config->getProjectRootPath()
         );
 
