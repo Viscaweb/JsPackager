@@ -5,7 +5,18 @@ namespace Visca\JsPackager;
 use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\EntryPoint;
 
-class MapJavascriptLoader implements JavascriptLoader
+/**
+ * Class MapJavascriptLoader
+ * @package Visca\JsPackager
+ *
+ * This Javascript loader relies on the existence of app/config/page_scripts.json
+ * file that is read and used as the sole argument this class requires as
+ * constructor input.
+ *
+ * That page_scripts.json file is generated with `app/console visca:jspackager-compress`
+ * console command.
+ */
+class JSONCacheJavascriptLoader implements JavascriptLoader
 {
     /** @var array */
     private $map;

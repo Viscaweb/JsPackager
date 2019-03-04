@@ -3,14 +3,14 @@
 namespace Visca\JsPackager\Webpack;
 
 use Visca\JsPackager\Report\EntryPoint;
-use Visca\JsPackager\Report\PackageReport;
+use Visca\JsPackager\Report\BundleReport;
 
 class BuildReportFactory
 {
     /**
      * @throws \RuntimeException
      */
-    public static function create(string $webpackOutput): PackageReport
+    public static function create(string $webpackOutput): BundleReport
     {
         // Try to convert output to JSON
         $jsonStats = json_decode($webpackOutput, true);
@@ -39,26 +39,17 @@ class BuildReportFactory
         }
         ksort($commonAssets);
 
+        if (!isset($jsonStats['entrypoints'])) {
+            throw new \RuntimeException('No entrypoints found.');
+        }
+
         $assetsBuilt = [];
-        if (isset($jsonStats['assetsByChunkName'])) {
-            foreach ($jsonStats['assetsByChunkName'] as $name => $asset) {
-                $path = '';
-                if (\is_string($asset)) {
-                    $path = $asset;
-                } elseif (\is_array($asset)) {
-                    // We may have generated source-maps, paths are grouped.
-                    $path = $asset[0];
-                }
+        foreach ($jsonStats['entrypoints'] as $name => $data) {
+            $filenames = array_map(function ($filename) use ($jsonStats) {
+                return $jsonStats['publicPath'].$filename;
+            }, $data['assets']);
 
-                $urls = [];
-                foreach ($commonAssets as $commonAsset) {
-                    $urls[] = $commonAsset;
-                }
-                $urls[] = $jsonStats['publicPath'].$path;
-
-
-                $assetsBuilt[$name] = new EntryPoint($name, $urls);
-            }
+            $assetsBuilt[$name] = new EntryPoint($name, $filenames);
         }
 
         $errors = [];
@@ -66,7 +57,7 @@ class BuildReportFactory
             $errors[] = $jsonStats['errors'][0];
         }
 
-        $report = new PackageReport($assetsBuilt, $commonAssets, $jsonStats['time'], $jsonStats['version'], $errors);
+        $report = new BundleReport($assetsBuilt, $commonAssets, $jsonStats['time'], $jsonStats['version'], $errors);
 
         return $report;
     }

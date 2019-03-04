@@ -43,11 +43,12 @@ class ConfigurationDefinition
     /** @var bool */
     private $minifyEnabled;
 
-    public function __construct(string $name, string $projectRootPath)
+    public function __construct(string $name, string $projectRootPath, string $outputPublicPath)
     {
         $this->name = $name;
         $this->minifyEnabled = true;
         $this->projectRootPath = $projectRootPath;
+        $this->outputPublicPath = $outputPublicPath;
     }
 
     public function getName(): string
@@ -62,18 +63,6 @@ class ConfigurationDefinition
         }
 
         return rtrim($this->outputPublicPath, '/').'/';
-    }
-
-    /**
-     * @param string $outputPublicPath
-     *
-     * @return ConfigurationDefinition
-     */
-    public function setOutputPublicPath(string $outputPublicPath): self
-    {
-        $this->outputPublicPath = rtrim($outputPublicPath, '/').'/';
-
-        return $this;
     }
 
     public function getBuildOutputPath(): string

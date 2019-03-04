@@ -2,7 +2,7 @@
 
 namespace Visca\JsPackager\Report;
 
-class PackageReport
+class BundleReport
 {
     /** @var string */
     protected $version;

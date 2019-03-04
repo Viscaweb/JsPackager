@@ -5,126 +5,111 @@ namespace Visca\JsPackager\Webpack;
 use Visca\JsPackager\Configuration\Alias;
 use Visca\JsPackager\Configuration\ConfigurationDefinition;
 use Visca\JsPackager\Configuration\Shim;
+use Visca\JsPackager\Resource\AliasAssetResource;
 use Visca\JsPackager\TemplateEngine\TemplateEngine;
 use Visca\JsPackager\Utils\FileSystem;
-use Visca\JsPackager\Webpack\Loaders\JsonLoader;
-use Visca\JsPackager\Webpack\Plugins\BundleAnalyzerPlugin;
-use Visca\JsPackager\Webpack\Plugins\CommonsChunkPlugin;
-use Visca\JsPackager\Webpack\Plugins\DuplicatePackageCheckerPlugin;
-use Visca\JsPackager\Webpack\Plugins\GenericPlugin;
-use Visca\JsPackager\Webpack\Plugins\MinChunkSizePlugin;
-use Visca\JsPackager\Webpack\Plugins\PluginDescriptorInterface;
-use Visca\JsPackager\Webpack\Plugins\ProvidePlugin;
-use Visca\JsPackager\Webpack\Plugins\UglifyJsPlugin;
+use Visca\JsPackager\Webpack\Configuration\Loaders\JsonLoader;
+use Visca\JsPackager\Webpack\Configuration\Plugins\BundleAnalyzerPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\CommonsChunkPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\DuplicatePackageCheckerPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\GenericPlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\MinChunkSizePlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\PluginDescriptorInterface;
+use Visca\JsPackager\Webpack\Configuration\Plugins\ProvidePlugin;
+use Visca\JsPackager\Webpack\Configuration\Plugins\UglifyJsPlugin;
 
 class WebpackConfigBuilder
 {
     /** @var string */
-//    protected $publicDir;
-
-    /** @var TemplateEngine */
-    protected $engine;
-
-    /** @var string */
-    protected $templatePath;
-
-    /** @var string */
-    protected $temporalPath;
+    private $webpackConfigFilePath;
 
     /** @var PluginDescriptorInterface[] */
     protected $plugins;
 
-    public function __construct(
-        TemplateEngine $engine,
-//        string $publicDir,
-        string $templatePath,
-        ?string $temporalPath = null,
-        array $plugins = []
-    ) {
-        FileSystem::ensureDirExists($temporalPath);
+    /** @var bool */
+    protected $developmentMode;
 
-        $this->engine = $engine;
-//        $this->publicDir = $publicDir;
-        $this->temporalPath = realpath($temporalPath);
-        $this->templatePath = $templatePath;
+    public function __construct(string $webpackConfigFilePath, array $plugins = [], bool $developmentMode = false)
+    {
+        $this->webpackConfigFilePath = $webpackConfigFilePath;
         $this->plugins = $plugins;
+        $this->developmentMode = $developmentMode;
     }
 
-    /**
-     * @param ConfigurationDefinition $config Configuration file.
-     * @param bool                    $debug  Enables some debugging info in the output.
-     *
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function generateConfigurationFile(ConfigurationDefinition $config, bool $debug = false)
+    public function generateConfigurationFile(ConfigurationDefinition $config, string $path): string
     {
-        $aliases = $config->getAlias();
-
-        //$webpackAlias = $this->getWebpackAliases($aliases);
-        //$shimmingModules = $this->getShimsModules($aliases);
-        $plugins = $this->getPlugins($config, $debug);
-        //$jsModules = $this->getJsModules($plugins);
-
-        $context = new WebpackConfiguration(
-            $config->getBuildOutputPath(),
-            $config->getEntryPoints(),
-            $config->getAlias(),
-            $plugins
-        );
-
-        $context->setOutputPublicPath($config->getOutputPublicPath());
-
-        $output = $this->engine->render(
-            $this->templatePath,
-            [
-                'outputPath' => $context->outputPath(),
-                'outputPublicPath' => $context->outputPublicPath(),
-                'entryPoints' => $context->entryPoints(),
-                'aliases' => $context->aliases(),
-                'plugins' => $context->plugins(),
-                'modules' => $context->modules()
-            ]
-        );
-
-        /*
-        $output = $this->engine->render(
-            $this->templatePath,
-            [
-                'jsModules' => $jsModules,
-                'entryPoints' => $config->getEntryPoints(),
-                'outputPath' => $config->getBuildOutputPath(),
-                'publicPath' => $config->getOutputPublicPath(),
-                'alias' => $webpackAlias,
-                'loaders' => $this->getLoaders(),
-                'plugins' => $plugins,
-            ]
-        );*/
-
-        $path = $this->temporalPath.'/'.$config->getName();
         FileSystem::ensureDirExists($path);
-        FileSystem::saveContent(
-            $configFileLocation = $path.'/webpack.config.'.$config->getName().'.js',
-            $output
-        );
+        $this->generateEntryPointsFile($config, $path);
+        $this->generateResolveAliasesFile($config, $path);
 
-        return $configFileLocation;
+        $webpackConfigPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.js');
+
+        $webpackConfig = file_get_contents($this->webpackConfigFilePath);
+        $webpackConfigProd = $this->generateOutputConfiguration($config, $webpackConfig, false);
+
+        // Generate prod configuration file
+        file_put_contents($webpackConfigPath, $webpackConfigProd);
+
+        // Generate dev configuration file
+        $webpackConfigDev = $this->generateOutputConfiguration($config, $webpackConfig, true);
+        $webpackConfigDevPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.dev.js');
+        file_put_contents($webpackConfigDevPath, $webpackConfigDev);
+
+        return $webpackConfigPath;
     }
 
-    public function getTemporalPath(): string
+    private function generateOutputConfiguration(ConfigurationDefinition $config, string $webpackConfig, bool $dev = false): string
     {
-        return $this->temporalPath;
+        $outputPublicPath = $dev ? 'http://localhost:8082' : '';
+        $outputPublicPath.= $config->getOutputPublicPath();
+
+        $webpackConfig = str_replace(
+            ['%output.publicPath%', '%output.path%'],
+            [$outputPublicPath, $config->getBuildOutputPath()],
+            $webpackConfig
+        );
+
+        return $webpackConfig;
     }
 
     /**
-     * @return array
+     * Generates a entry-point-<app>.js file with the content of all existing
+     * entry-point files. This file will be referenced in webpack.config.js file.
      */
-    private function getLoaders()
+    private function generateEntryPointsFile(ConfigurationDefinition $config, string $path)
     {
-        $loaders = [];
-        $loaders[] = new JsonLoader();
+        $array = [];
+        foreach ($config->getEntryPoints() as $entryPoint) {
+            $resource = $entryPoint->getResource();
+            if ($resource instanceof AliasAssetResource) {
+                $array[$entryPoint->getName()] = $resource->getAliases();
+            } else {
+                $array[$entryPoint->getName()] = $entryPoint->getResource()->getPath();
+            }
+        }
 
-        return $loaders;
+        $output = 'module.exports = ' . json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . ';';
+
+        $filename = $this->getNamespacedFilename($config, 'entry-points.js');
+        file_put_contents($path . '/' . $filename, $output);
+    }
+
+    private function generateResolveAliasesFile(ConfigurationDefinition $config, string $path)
+    {
+        $array = [];
+        foreach ($config->getAlias() as $alias) {
+            $array[$alias->getName()] = $alias->getResource()->getPath();
+        }
+
+        $output = 'module.exports = ' . json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . ';';
+
+        $filename = $this->getNamespacedFilename($config, 'aliases.js');
+        file_put_contents($path . '/' . $filename, $output);
+    }
+
+    private function getNamespacedFilename(ConfigurationDefinition $config, string $filename): string
+    {
+        return $filename;
     }
 
     /**
@@ -158,8 +143,13 @@ class WebpackConfigBuilder
             $plugins[] = new UglifyJsPlugin();
         }
         $plugins[] = new MinChunkSizePlugin();
-        $plugins[] = new DuplicatePackageCheckerPlugin();
+//        $plugins[] = new DuplicatePackageCheckerPlugin();
         $plugins[] = new GenericPlugin('webpack2PolyfillPlugin', 'webpack2-polyfill-plugin');
+        $plugins[] = new GenericPlugin(
+            'webpackStatsPlugin',
+            './../../../../../WebpackStatsPlugin',
+            ['path' => $this->getTemporalPath() . '/' . $config->getName()]
+        );
 
         if ($debug) {
             $plugins[] = new BundleAnalyzerPlugin();
@@ -170,21 +160,6 @@ class WebpackConfigBuilder
         }
 
         return $plugins;
-    }
-
-    /**
-     * @param Alias[] $aliases
-     */
-    private function getWebpackAliases(array $aliases): array
-    {
-        $webpackAlias = [];
-
-        foreach ($aliases as $alias) {
-            $resource = $alias->getResource();
-            $webpackAlias[$alias->getName()] = $resource->getPath();
-        }
-
-        return $webpackAlias;
     }
 
     /**
