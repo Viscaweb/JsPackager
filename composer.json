@@ -7,8 +7,7 @@
   "prefer-stable": true,
   "require": {
     "php": ">=7.1",
-    "ext-json": "*",
-    "mustache/mustache": "^2.12"
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {
