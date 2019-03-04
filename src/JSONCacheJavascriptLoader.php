@@ -31,6 +31,10 @@ class JSONCacheJavascriptLoader implements JavascriptLoader
         $urls = $this->map[$configuration->getName()][$entryPoint->getName()] ?? '';
 
         $html = '';
+        if (\is_array($urls) === false) {
+            return $html;
+        }
+
         foreach ($urls as $url) {
             $html.= '<script src="'.$url.'"></script>';
         }
