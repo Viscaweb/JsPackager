@@ -9,5 +9,5 @@ interface JavascriptBundler
 {
     public function getName(): string;
 
-    public function bundle(ConfigurationDefinition $configuration): BundleReport;
+    public function bundle(ConfigurationDefinition $configuration, string $environment): BundleReport;
 }

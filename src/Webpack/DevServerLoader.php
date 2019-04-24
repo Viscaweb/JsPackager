@@ -64,11 +64,11 @@ class DevServerLoader implements JavascriptLoader
         $assets = array_filter($assets, function ($path) {
             return preg_match('/\.js$/', $path);
         });
-
+/*
         $assets = array_map(function ($path) use ($serverUrl) {
             return $serverUrl .$path;
         }, $assets);
-
+*/
         return $assets;
     }
 
