@@ -21,7 +21,10 @@ use Visca\JsPackager\Webpack\Configuration\Plugins\UglifyJsPlugin;
 class WebpackConfigBuilder
 {
     /** @var string */
-    private $webpackConfigFilePath;
+    private $configTemplatePath;
+
+    /** @var string */
+    private $configDevTemplatePath;
 
     /** @var PluginDescriptorInterface[] */
     protected $plugins;
@@ -29,9 +32,10 @@ class WebpackConfigBuilder
     /** @var bool */
     protected $developmentMode;
 
-    public function __construct(string $webpackConfigFilePath, array $plugins = [], bool $developmentMode = false)
+    public function __construct(string $configTemplatePath, string $configDevTemplatePath, array $plugins = [], bool $developmentMode = false)
     {
-        $this->webpackConfigFilePath = $webpackConfigFilePath;
+        $this->configTemplatePath = $configTemplatePath;
+        $this->configDevTemplatePath = $configDevTemplatePath;
         $this->plugins = $plugins;
         $this->developmentMode = $developmentMode;
     }
@@ -42,20 +46,29 @@ class WebpackConfigBuilder
         $this->generateEntryPointsFile($config, $path);
         $this->generateResolveAliasesFile($config, $path);
 
-        $webpackConfigPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.js');
-
-        $webpackConfig = file_get_contents($this->webpackConfigFilePath);
-        $webpackConfigProd = $this->generateOutputConfiguration($config, $webpackConfig, false);
+        $webpackConfigPath = $this->configurationFilePath($path, 'prod');
 
         // Generate prod configuration file
+        // --------------------------------
+        $webpackConfigTemplateContent = file_get_contents($this->configTemplatePath);
+        $webpackConfigProd = $this->generateOutputConfiguration($config, $webpackConfigTemplateContent, false);
         file_put_contents($webpackConfigPath, $webpackConfigProd);
 
         // Generate dev configuration file
-        $webpackConfigDev = $this->generateOutputConfiguration($config, $webpackConfig, true);
-        $webpackConfigDevPath = $path . '/' . $this->getNamespacedFilename($config, 'webpack.config.dev.js');
+        // -------------------------------
+        $webpackConfigTemplateContent = file_get_contents($this->configDevTemplatePath);
+        $webpackConfigDev = $this->generateOutputConfiguration($config, $webpackConfigTemplateContent, true);
+        $webpackConfigDevPath = $this->configurationFilePath($path , 'dev');
         file_put_contents($webpackConfigDevPath, $webpackConfigDev);
 
         return $webpackConfigPath;
+    }
+
+    public function configurationFilePath(string $path, string $environment): string
+    {
+        $environment = $environment === 'prod' ? '' : '.'.$environment;
+
+        return $path . '/webpack.config'.$environment.'.js';
     }
 
     private function generateOutputConfiguration(ConfigurationDefinition $config, string $webpackConfig, bool $dev = false): string
@@ -90,7 +103,7 @@ class WebpackConfigBuilder
 
         $output = 'module.exports = ' . json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . ';';
 
-        $filename = $this->getNamespacedFilename($config, 'entry-points.js');
+        $filename = 'entry-points.js';
         file_put_contents($path . '/' . $filename, $output);
     }
 
@@ -103,13 +116,8 @@ class WebpackConfigBuilder
 
         $output = 'module.exports = ' . json_encode($array, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . ';';
 
-        $filename = $this->getNamespacedFilename($config, 'aliases.js');
+        $filename = 'aliases.js';
         file_put_contents($path . '/' . $filename, $output);
-    }
-
-    private function getNamespacedFilename(ConfigurationDefinition $config, string $filename): string
-    {
-        return $filename;
     }
 
     /**

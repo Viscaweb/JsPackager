@@ -37,10 +37,12 @@ class WebpackBundler implements JavascriptBundler
         return 'webpack';
     }
 
-    public function bundle(ConfigurationDefinition $configuration): BundleReport
+    public function bundle(ConfigurationDefinition $configuration, string $environment): BundleReport
     {
         $path = $this->tmpPath . '/'.$configuration->getName();
-        $webpackConfigPath = $this->webpackConfigBuilder->generateConfigurationFile($configuration, $path);
+        $this->webpackConfigBuilder->generateConfigurationFile($configuration, $path);
+
+        $webpackConfigPath = $this->webpackConfigBuilder->configurationFilePath($path, $environment);
 
         return $this->runCompilation($webpackConfigPath, $configuration);
     }

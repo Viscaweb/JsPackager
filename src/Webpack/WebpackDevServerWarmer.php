@@ -25,7 +25,7 @@ class WebpackDevServerWarmer implements JavascriptBundler
         return 'webpack-warmer';
     }
 
-    public function bundle(ConfigurationDefinition $configuration): BundleReport
+    public function bundle(ConfigurationDefinition $configuration, string $environment): BundleReport
     {
         $path = $this->tmpPath . '/'.$configuration->getName();
         $this->webpackConfigBuilder->generateConfigurationFile($configuration, $path);
