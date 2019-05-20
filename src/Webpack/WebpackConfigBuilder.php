@@ -73,7 +73,7 @@ class WebpackConfigBuilder
 
     private function generateOutputConfiguration(ConfigurationDefinition $config, string $webpackConfig, bool $dev = false): string
     {
-        $outputPublicPath = $dev ? 'http://localhost:8082' : '';
+        $outputPublicPath = $dev ? 'http://localhost:8082' : $config->cdnDomain();
         $outputPublicPath.= $config->getOutputPublicPath();
 
         $webpackConfig = str_replace(

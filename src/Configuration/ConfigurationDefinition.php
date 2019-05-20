@@ -93,6 +93,13 @@ class ConfigurationDefinition
         return $this->domainsInjection;
     }
 
+    public function cdnDomain(): string
+    {
+        $index = rand(0, count($this->domainsInjection) - 1 );
+
+        return $this->domainsInjection[$index];
+    }
+
     /**
      * Adds a new entry point to be processed.
      *
