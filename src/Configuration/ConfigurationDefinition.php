@@ -95,9 +95,9 @@ class ConfigurationDefinition
 
     public function cdnDomain(): string
     {
-        $index = rand(0, count($this->domainsInjection) - 1 );
+//        $index = rand(0, count($this->domainsInjection) - 1 );
 
-        return $this->domainsInjection[$index];
+        return $this->domainsInjection[0];
     }
 
     /**
